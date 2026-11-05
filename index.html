@@ -3,19 +3,23 @@
 <title>Catálogo</title><link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="config.js"></script></head>
-<body><header><a href="#" id="logo"></a></header><main class="wrap" id="app">Carregando...</main><footer id="rod"></footer>
+<body>
+<header class="perfil"><a href="#"><img class="avatar" src="logo.png" alt="Logo"></a>
+<div><div class="nome" id="logo"></div><p class="bio">A loja que fortalece os cria</p>
+<ul class="infos"><li>Pirapetinga-MG</li><li>Todas as formas de pagamento</li><li>Enviamos</li></ul></div></header>
+<main class="wrap" id="app">Carregando...</main><footer id="rod"></footer>
 <script>
 document.getElementById("logo").textContent=LOJA;document.title=LOJA+" | Catálogo";document.getElementById("rod").textContent="© "+LOJA;
 var db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY),app=document.getElementById("app"),P=[],cat="Todos",tam=null;
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 function brl(v){return Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
 function tams(p){return String(p.tamanhos||"U").split(",").map(function(t){return t.trim()}).filter(Boolean)}
-function img(p){return '<div class="foto">'+(p.foto_url?'<img src="'+esc(p.foto_url)+'" alt="'+esc(p.nome)+'">':'')+'</div>'}
+function img(p){return p.foto_url?'<div class="foto"><img src="'+esc(p.foto_url)+'" alt="'+esc(p.nome)+'"></div>':'<div class="foto vazio"></div>'}
 function lista(){
  if(!P.length){app.innerHTML="<p>Nenhum produto cadastrado ainda.</p>";return}
  var cats=["Todos"].concat(P.map(function(p){return p.categoria}).filter(function(c,i,a){return c&&a.indexOf(c)===i}));
  var it=P.filter(function(p){return cat==="Todos"||p.categoria===cat});
- app.innerHTML='<h1>Catálogo</h1><div class="filtros">'+cats.map(function(c){return '<button data-c="'+esc(c)+'" class="'+(c===cat?"ativo":"")+'">'+esc(c)+'</button>'}).join("")+'</div><div class="grade">'+it.map(function(p){return '<a class="card" href="#'+p.id+'">'+img(p)+'<h2>'+esc(p.nome)+'</h2><p>'+brl(p.preco)+'</p></a>'}).join("")+'</div>';
+ app.innerHTML='<div class="bolhas">'+cats.map(function(c){return '<button class="bolha'+(c===cat?" ativo":"")+'" data-c="'+esc(c)+'"><span class="aro"><img src="logo.png" alt=""></span><span class="rot">'+esc(c)+'</span></button>'}).join("")+'</div><div class="grade">'+it.map(function(p){return '<a class="card" href="#'+p.id+'">'+img(p)+'<h2>'+esc(p.nome)+'</h2><p>'+brl(p.preco)+'</p></a>'}).join("")+'</div>';
  app.querySelectorAll("[data-c]").forEach(function(b){b.onclick=function(){cat=b.dataset.c;lista()}});
 }
 function prod(p){
