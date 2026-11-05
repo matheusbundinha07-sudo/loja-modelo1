@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sua Loja | Catálogo</title>
+<style>
+:root{--fundo:#faf8f5;--texto:#1f1d1a;--suave:#6e6860;--linha:#e3ddd3;--destaque:#1f3d2f}
+@media(prefers-color-scheme:dark){:root{--fundo:#171614;--texto:#f1ede6;--suave:#a39d93;--linha:#34312c;--destaque:#8fc4a5}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fundo);color:var(--texto);font-family:Georgia,"Times New Roman",serif;line-height:1.55}
+a{color:inherit;text-decoration:none}
+header{padding:20px 24px;border-bottom:1px solid var(--linha);font-size:1.4rem}
+.wrap{max-width:1100px;margin:0 auto;padding:24px}
+h1{font-weight:400;font-size:2rem;margin:8px 0 20px}
+.filtros{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+button{font:inherit;font-size:.9rem;padding:8px 16px;border:1px solid var(--linha);background:transparent;color:var(--texto);border-radius:999px;cursor:pointer}
+button.ativo{background:var(--destaque);color:var(--fundo);border-color:var(--destaque)}
+.grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:24px 16px}
+.foto{aspect-ratio:3/4;overflow:hidden;border-radius:4px}
+.foto img{width:100%;height:100%;object-fit:cover;display:block}
+.card h2{font-size:1rem;font-weight:400;margin:10px 0 2px}
+.card p{margin:0;color:var(--suave)}
+.voltar{color:var(--suave);font-size:.9rem}
+.detalhe{display:grid;grid-template-columns:1fr;gap:24px;margin-top:16px}
+@media(min-width:760px){.detalhe{grid-template-columns:1fr 1fr;gap:48px}}
+.galeria{display:grid;gap:12px}
+.preco{font-size:1.5rem;margin:0 0 12px}
+.rotulo{margin:24px 0 8px;color:var(--suave);font-size:.9rem}
+.zap{display:inline-block;margin-top:8px;padding:14px 28px;background:var(--destaque);color:var(--fundo);border-radius:4px}
+footer{padding:32px 24px;color:var(--suave);font-size:.85rem;text-align:center}
+</style>
+</head>
+<body>
+<header><a href="#">Sua Loja</a></header>
+<main class="wrap" id="app"></main>
+<footer>© Sua Loja</footer>
+<script>
+// ====== EDITE AQUI ======
+// WhatsApp: 55 + DDD + número, só dígitos
+var WHATSAPP = "5522999999999";
+// Fotos: use um link de imagem, ex: fotos: ["https://site.com/foto.jpg"]
+var PRODUTOS = [
+  {id:"vestido-linho",nome:"Vestido de linho",preco:189.9,categoria:"Vestidos",tamanhos:["P","M","G"],cor:"#c9b79c",fotos:[],descricao:"Vestido midi em linho, caimento solto e confortável."},
+  {id:"camisa-listrada",nome:"Camisa listrada",preco:129.9,categoria:"Camisas",tamanhos:["P","M","G","GG"],cor:"#8fa3b5",fotos:[],descricao:"Camisa de algodão com listras finas."},
+  {id:"calca-alfaiataria",nome:"Calça alfaiataria",preco:219.9,categoria:"Calças",tamanhos:["38","40","42","44"],cor:"#4a4a48",fotos:[],descricao:"Calça de cintura alta com corte reto."},
+  {id:"saia-plissada",nome:"Saia plissada",preco:149.9,categoria:"Saias",tamanhos:["P","M","G"],cor:"#b5756b",fotos:[],descricao:"Saia midi plissada, forro interno."},
+  {id:"blusa-tricot",nome:"Blusa de tricô",preco:99.9,categoria:"Blusas",tamanhos:["P","M","G"],cor:"#d8cfc0",fotos:[],descricao:"Tricô macio, ótima para meia-estação."},
+  {id:"jaqueta-jeans",nome:"Jaqueta jeans",preco:249.9,categoria:"Jaquetas",tamanhos:["P","M","G","GG"],cor:"#5b7391",fotos:[],descricao:"Jeans lavado com bolsos frontais."}
+];
+// ====== FIM ======
+
+var app = document.getElementById("app");
+var cat = "Todos", tam = null;
+function brl(v){return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});}
+function foto(p,grande){
+  if(p.fotos.length){return p.fotos.map(function(f){return '<div class="foto"><img src="'+f+'" alt="'+p.nome+'"></div>';}).join("");}
+  return '<div class="foto" style="background:'+p.cor+'"></div>';
+}
+function lista(){
+  var cats=["Todos"].concat(PRODUTOS.map(function(p){return p.categoria;}).filter(function(c,i,a){return a.indexOf(c)===i;}));
+  var itens=PRODUTOS.filter(function(p){return cat==="Todos"||p.categoria===cat;});
+  app.innerHTML='<h1>Catálogo</h1><div class="filtros">'+cats.map(function(c){return '<button data-cat="'+c+'" class="'+(c===cat?"ativo":"")+'">'+c+'</button>';}).join("")+'</div><div class="grade">'+itens.map(function(p){
+    return '<a class="card" href="#'+p.id+'">'+(p.fotos.length?'<div class="foto"><img src="'+p.fotos[0]+'" alt="'+p.nome+'"></div>':'<div class="foto" style="background:'+p.cor+'"></div>')+'<h2>'+p.nome+'</h2><p>'+brl(p.preco)+'</p></a>';
+  }).join("")+'</div>';
+  app.querySelectorAll("[data-cat]").forEach(function(b){b.onclick=function(){cat=b.dataset.cat;lista();};});
+}
+function produto(p){
+  if(!tam||p.tamanhos.indexOf(tam)<0)tam=p.tamanhos[0];
+  var msg=encodeURIComponent('Olá! Quero o produto "'+p.nome+'", tamanho '+tam+'. Está disponível?');
+  app.innerHTML='<a class="voltar" href="#">Voltar ao catálogo</a><div class="detalhe"><div class="galeria">'+foto(p)+'</div><div><h1>'+p.nome+'</h1><p class="preco">'+brl(p.preco)+'</p><p>'+p.descricao+'</p><p class="rotulo">Tamanho</p><div class="filtros">'+p.tamanhos.map(function(t){return '<button data-t="'+t+'" class="'+(t===tam?"ativo":"")+'">'+t+'</button>';}).join("")+'</div><a class="zap" target="_blank" rel="noopener" href="https://wa.me/'+WHATSAPP+'?text='+msg+'">Pedir pelo WhatsApp</a></div></div>';
+  app.querySelectorAll("[data-t]").forEach(function(b){b.onclick=function(){tam=b.dataset.t;produto(p);};});
+}
+function rota(){
+  var id=location.hash.slice(1);
+  var p=PRODUTOS.filter(function(x){return x.id===id;})[0];
+  if(p){tam=null;produto(p);}else{lista();}
+  window.scrollTo(0,0);
+}
+window.addEventListener("hashchange",rota);
+rota();
+</script>
+</body>
+</html>
