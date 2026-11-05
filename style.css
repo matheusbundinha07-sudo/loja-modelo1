@@ -1,0 +1,33 @@
+:root{--fundo:#faf8f5;--texto:#1f1d1a;--suave:#6e6860;--linha:#e3ddd3;--destaque:#1f3d2f}
+@media(prefers-color-scheme:dark){:root{--fundo:#171614;--texto:#f1ede6;--suave:#a39d93;--linha:#34312c;--destaque:#8fc4a5}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fundo);color:var(--texto);font-family:Georgia,"Times New Roman",serif;line-height:1.55}
+a{color:inherit;text-decoration:none}
+header{padding:20px 24px;border-bottom:1px solid var(--linha);font-size:1.4rem}
+.wrap{max-width:1100px;margin:0 auto;padding:24px}
+h1{font-weight:400;font-size:2rem;margin:8px 0 20px}
+h2{font-weight:400}
+.filtros{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+button,.btn{font:inherit;font-size:.9rem;padding:8px 16px;border:1px solid var(--linha);background:transparent;color:var(--texto);border-radius:999px;cursor:pointer}
+button.ativo,button.principal{background:var(--destaque);color:var(--fundo);border-color:var(--destaque)}
+.grade{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:24px 16px}
+.foto{aspect-ratio:3/4;overflow:hidden;border-radius:4px;background:var(--linha)}
+.foto img{width:100%;height:100%;object-fit:cover;display:block}
+.card h2{font-size:1rem;margin:10px 0 2px}
+.card p{margin:0;color:var(--suave)}
+.voltar{color:var(--suave);font-size:.9rem}
+.detalhe{display:grid;grid-template-columns:1fr;gap:24px;margin-top:16px}
+@media(min-width:760px){.detalhe{grid-template-columns:1fr 1fr;gap:48px}}
+.preco{font-size:1.5rem;margin:0 0 12px}
+.rotulo{margin:24px 0 8px;color:var(--suave);font-size:.9rem}
+.zap{display:inline-block;margin-top:8px;padding:14px 28px;background:var(--destaque);color:var(--fundo);border-radius:4px}
+footer{padding:32px 24px;color:var(--suave);font-size:.85rem;text-align:center}
+label{display:block;margin:12px 0 4px;color:var(--suave);font-size:.9rem}
+input,textarea{width:100%;font:inherit;padding:10px;border:1px solid var(--linha);border-radius:4px;background:transparent;color:var(--texto)}
+.linha{display:flex;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--linha)}
+.linha img,.linha .mini{width:56px;height:72px;object-fit:cover;border-radius:4px;background:var(--linha);flex:none}
+.linha .info{flex:1}
+.topo2{display:flex;justify-content:space-between;align-items:center}
+.caixa{border:1px solid var(--linha);border-radius:8px;padding:16px;margin-bottom:24px}
+.erro{color:#c0392b;margin-top:12px}
+.chk{display:flex;gap:8px;align-items:center;margin-top:12px}.chk input{width:auto}
