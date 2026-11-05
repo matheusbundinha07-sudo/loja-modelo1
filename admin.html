@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex"><title>Painel</title><link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script></head>
+<body><main class="wrap" id="box" style="max-width:640px"></main>
+<script>
+var db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY),box=document.getElementById("box"),itens=[];
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function $(id){return document.getElementById(id)}
+function login(msg){
+ box.innerHTML='<h1>Entrar no painel</h1><label>E-mail</label><input id="em" type="email"><label>Senha</label><input id="se" type="password"><p><button class="principal" id="go">Entrar</button></p><p class="erro" id="er">'+(msg||"")+'</p>';
+ $("go").onclick=async function(){var r=await db.auth.signInWithPassword({email:$("em").value.trim(),password:$("se").value});if(r.error)$("er").textContent="E-mail ou senha incorretos.";else painel()};
+}
+async function painel(){
+ var r=await db.from("produtos").select("*").order("criado",{ascending:false});
+ if(r.error){login("Sessão expirada. Entre de novo.");return}
+ itens=r.data;
+ box.innerHTML='<div class="topo2"><h1>Painel da loja</h1><button id="sair">Sair</button></div><div id="form" class="caixa"></div><h2>Produtos ('+itens.length+')</h2><div id="lista"></div>';
+ $("sair").onclick=async function(){await db.auth.signOut();login()};
+ $("lista").innerHTML=itens.map(function(p){return '<div class="linha">'+(p.foto_url?'<img src="'+esc(p.foto_url)+'" alt="">':'<div class="mini"></div>')+'<div class="info"><strong>'+esc(p.nome)+'</strong><br>R$ '+Number(p.preco).toFixed(2).replace(".",",")+(p.ativo?'':' (oculto)')+'</div><button data-e="'+p.id+'">Editar</button><button data-x="'+p.id+'">Excluir</button></div>'}).join("")||"<p>Nenhum produto ainda.</p>";
+ $("lista").querySelectorAll("[data-e]").forEach(function(b){b.onclick=function(){form(itens.filter(function(x){return x.id===b.dataset.e})[0]);scrollTo(0,0)}});
+ $("lista").querySelectorAll("[data-x]").forEach(function(b){b.onclick=async function(){if(!confirm("Excluir este produto?"))return;var d=await db.from("produtos").delete().eq("id",b.dataset.x);if(d.error)alert("Erro ao excluir.");else painel()}});
+ form(null);
+}
+function form(p){
+ p=p||{};
+ $("form").innerHTML='<h2>'+(p.id?"Editar produto":"Novo produto")+'</h2><label>Nome</label><input id="nome" value="'+esc(p.nome)+'"><label>Preço (ex: 129,90)</label><input id="preco" value="'+(p.preco!=null?String(p.preco).replace(".",","):"")+'"><label>Categoria (ex: Vestidos)</label><input id="cat" value="'+esc(p.categoria)+'"><label>Tamanhos separados por vírgula (ex: P, M, G)</label><input id="tam" value="'+esc(p.tamanhos)+'"><label>Descrição</label><textarea id="desc" rows="3">'+esc(p.descricao)+'</textarea><label>Foto'+(p.foto_url?' (já tem uma; escolha outra para trocar)':'')+'</label><input id="foto" type="file" accept="image/*"><div class="chk"><input id="ativo" type="checkbox" '+(p.id&&!p.ativo?'':'checked')+'><span>Mostrar no catálogo</span></div><p><button class="principal" id="salvar">Salvar</button> '+(p.id?'<button id="canc">Cancelar</button>':'')+'</p><p class="erro" id="er"></p>';
+ if(p.id)$("canc").onclick=function(){form(null)};
+ $("salvar").onclick=async function(){
+  var preco=parseFloat($("preco").value.replace(",","."));
+  if(!$("nome").value.trim()||isNaN(preco)){$("er").textContent="Preencha o nome e um preço válido.";return}
+  $("salvar").disabled=true;$("salvar").textContent="Salvando...";
+  var d={nome:$("nome").value.trim(),preco:preco,categoria:$("cat").value.trim(),tamanhos:$("tam").value.trim(),descricao:$("desc").value.trim(),ativo:$("ativo").checked,foto_url:p.foto_url||null};
+  var f=$("foto").files[0];
+  if(f){var n=Date.now()+"-"+f.name.replace(/[^a-zA-Z0-9.]/g,"_");var u=await db.storage.from("fotos").upload(n,f);
+   if(u.error){$("er").textContent="Erro ao enviar a foto.";$("salvar").disabled=false;$("salvar").textContent="Salvar";return}
+   d.foto_url=db.storage.from("fotos").getPublicUrl(n).data.publicUrl}
+  var r=p.id?await db.from("produtos").update(d).eq("id",p.id):await db.from("produtos").insert(d);
+  if(r.error){$("er").textContent="Erro ao salvar. Tente entrar de novo.";$("salvar").disabled=false;$("salvar").textContent="Salvar"}else painel();
+ };
+}
+db.auth.getSession().then(function(r){r.data.session?painel():login()});
+</script></body></html>
