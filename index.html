@@ -12,17 +12,23 @@
 <script>
 document.getElementById("logo").textContent=LOJA;document.title=LOJA+" | Catálogo";document.getElementById("rod").textContent="© "+LOJA;
 document.getElementById("contato").href="https://wa.me/"+WHATSAPP;
-var db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY),app=document.getElementById("app"),P=[],cat="Todos",tam=null;
+var db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY),app=document.getElementById("app"),P=[],cat="Todos",tam=null,sel=[];
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 function brl(v){return Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
 function tams(p){return String(p.tamanhos||"U").split(",").map(function(t){return t.trim()}).filter(Boolean)}
 function img(p){return p.foto_url?'<div class="foto"><img src="'+esc(p.foto_url)+'" alt="'+esc(p.nome)+'"></div>':'<div class="foto vazio"></div>'}
+var ORDEM=["PP","P","M","G","GG","XG","XGG","Único"];
+function ordem(a,b){var i=ORDEM.indexOf(a),j=ORDEM.indexOf(b);if(i<0&&j<0)return(parseFloat(a)||0)-(parseFloat(b)||0);if(i<0)return 1;if(j<0)return-1;return i-j}
 function lista(){
  if(!P.length){app.innerHTML="<p style='padding:24px 8px'>Nenhum produto cadastrado ainda.</p>";return}
  var cats=["Todos"].concat(P.map(function(p){return p.categoria}).filter(function(c,i,a){return c&&a.indexOf(c)===i}));
- var it=P.filter(function(p){return cat==="Todos"||p.categoria===cat});
- app.innerHTML='<div class="intro"><p class="lema">A loja que fortalece os cria.</p><p class="local">Pirapetinga-MG</p></div><div class="abas">'+cats.map(function(c){return '<button class="aba'+(c===cat?" ativo":"")+'" data-c="'+esc(c)+'">'+esc(c)+'</button>'}).join("")+'</div><div class="grade">'+it.map(function(p){return '<a class="card" href="#'+p.id+'">'+img(p)+'<h2>'+esc(p.nome)+'</h2><p>'+brl(p.preco)+'</p></a>'}).join("")+'</div>';
- app.querySelectorAll("[data-c]").forEach(function(b){b.onclick=function(){cat=b.dataset.c;lista()}});
+ var daCat=P.filter(function(p){return cat==="Todos"||p.categoria===cat});
+ var TT=[];daCat.forEach(function(p){tams(p).forEach(function(t){if(TT.indexOf(t)<0)TT.push(t)})});TT.sort(ordem);
+ var it=daCat.filter(function(p){return !sel.length||tams(p).some(function(t){return sel.indexOf(t)>=0})});
+ app.innerHTML='<div class="intro"><p class="lema">A loja que fortalece os cria.</p><p class="local">Pirapetinga-MG</p></div><div class="abas">'+cats.map(function(c){return '<button class="aba'+(c===cat?" ativo":"")+'" data-c="'+esc(c)+'">'+esc(c)+'</button>'}).join("")+'</div><div class="loja"><aside class="filtro"><h3>Tamanho</h3><div class="tams">'+TT.map(function(t){return '<button data-f="'+esc(t)+'" class="'+(sel.indexOf(t)>=0?"ativo":"")+'">'+esc(t)+'</button>'}).join("")+'</div>'+(sel.length?'<button class="limpar" id="limpar">Limpar filtro</button>':'')+'</aside><div><p class="conta">'+it.length+(it.length===1?" produto":" produtos")+'</p>'+(it.length?'<div class="grade">'+it.map(function(p){return '<a class="card" href="#'+p.id+'">'+img(p)+'<h2>'+esc(p.nome)+'</h2><p>'+brl(p.preco)+'</p></a>'}).join("")+'</div>':'<p class="conta">Nenhum produto nesse tamanho.</p>')+'</div></div>';
+ app.querySelectorAll("[data-c]").forEach(function(b){b.onclick=function(){cat=b.dataset.c;sel=[];lista()}});
+ app.querySelectorAll("[data-f]").forEach(function(b){b.onclick=function(){var t=b.dataset.f,i=sel.indexOf(t);if(i<0)sel.push(t);else sel.splice(i,1);lista()}});
+ var l=document.getElementById("limpar");if(l)l.onclick=function(){sel=[];lista()};
 }
 function prod(p){
  var T=tams(p);if(!tam||T.indexOf(tam)<0)tam=T[0];

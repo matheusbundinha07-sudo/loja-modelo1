@@ -52,3 +52,9 @@ input,textarea{width:100%;font:inherit;padding:10px;border:1px solid #c9c9c5;bor
 .topo2{display:flex;justify-content:space-between;align-items:center;gap:12px}
 .erro{color:#b3261e;margin-top:12px}
 .chk{display:flex;gap:8px;align-items:center;margin-top:12px}.chk input{width:auto}
+.loja{display:block}
+@media(min-width:800px){.loja{display:grid;grid-template-columns:170px 1fr;gap:40px;align-items:start}.filtro{position:sticky;top:24px}}
+.filtro{padding:0 8px 20px}
+.filtro h3{font-size:.85rem;font-weight:500;color:var(--suave);margin:0 0 10px}
+.limpar{border:0;padding:0;margin-top:14px;background:none;color:var(--suave);font-size:.85rem;text-decoration:underline}
+.conta{color:var(--suave);font-size:.85rem;margin:0 8px 16px}
