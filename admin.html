@@ -19,6 +19,8 @@ function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){retur
 function $(id){return document.getElementById(id)}
 // OPÇÕES DO FORMULÁRIO: para incluir uma nova categoria ou tamanho, acrescente na lista
 var CATEGORIAS=["Camisetas","Bonés","Bermudas","Moletons","Calças","Jaquetas","Camisas","Blusas","Vestidos","Saias","Acessórios"];
+var VARIEDADES={"Camisetas":["Malhas Peruanas","Times","Oversized"]};
+function selVar(c,v){var l=(VARIEDADES[c]||[]).slice();if(v&&l.indexOf(v)<0)l.push(v);if(!l.length)return"";return '<label>Variedade</label><select id="vari"><option value="">Nenhuma</option>'+l.map(function(x){return '<option'+(x===v?' selected':'')+'>'+esc(x)+'</option>'}).join("")+'</select>'}
 var TAMANHOS=["PP","P","M","G","GG","XG","Único","36","38","40","42","44","46"];
 function selCat(v){var l=CATEGORIAS.slice();if(v&&l.indexOf(v)<0)l.push(v);return '<select id="cat"><option value="">Escolha...</option>'+l.map(function(c){return '<option'+(c===v?' selected':'')+'>'+esc(c)+'</option>'}).join("")+'</select>'}
 function chipsTam(v){var s=String(v||"").split(",").map(function(t){return t.trim()}).filter(Boolean),l=TAMANHOS.slice();s.forEach(function(t){if(l.indexOf(t)<0)l.push(t)});return '<div class="chips">'+l.map(function(t){return '<label><input type="checkbox" name="tam" value="'+esc(t)+'"'+(s.indexOf(t)>=0?' checked':'')+'><span>'+esc(t)+'</span></label>'}).join("")+'</div>'}
@@ -40,7 +42,8 @@ async function painel(){
 }
 function form(p){
  p=p||{};
- $("form").innerHTML='<h2>'+(p.id?"Editar produto":"Novo produto")+'</h2><label>Nome</label><input id="nome" value="'+esc(p.nome)+'"><label>Preço (ex: 129,90)</label><input id="preco" value="'+(p.preco!=null?String(p.preco).replace(".",","):"")+'"><label>Categoria</label>'+selCat(p.categoria)+'<label>Tamanhos (marque os que tem)</label>'+chipsTam(p.tamanhos)+'<label>Descrição</label><textarea id="desc" rows="3">'+esc(p.descricao)+'</textarea><label>Foto'+(p.foto_url?' (já tem uma; escolha outra para trocar)':'')+'</label><input id="foto" type="file" accept="image/*"><div class="chk"><input id="ativo" type="checkbox" '+(p.id&&!p.ativo?'':'checked')+'><span>Mostrar no catálogo</span></div><p><button class="principal" id="salvar">Salvar</button> '+(p.id?'<button id="canc">Cancelar</button>':'')+'</p><p class="erro" id="er"></p>';
+ $("form").innerHTML='<h2>'+(p.id?"Editar produto":"Novo produto")+'</h2><label>Nome</label><input id="nome" value="'+esc(p.nome)+'"><label>Preço (ex: 129,90)</label><input id="preco" value="'+(p.preco!=null?String(p.preco).replace(".",","):"")+'"><label>Categoria</label>'+selCat(p.categoria)+'<div id="varbox">'+selVar(p.categoria,p.variedade)+'</div><label>Tamanhos (marque os que tem)</label>'+chipsTam(p.tamanhos)+'<label>Descrição</label><textarea id="desc" rows="3">'+esc(p.descricao)+'</textarea><label>Foto'+(p.foto_url?' (já tem uma; escolha outra para trocar)':'')+'</label><input id="foto" type="file" accept="image/*"><div class="chk"><input id="ativo" type="checkbox" '+(p.id&&!p.ativo?'':'checked')+'><span>Mostrar no catálogo</span></div><p><button class="principal" id="salvar">Salvar</button> '+(p.id?'<button id="canc">Cancelar</button>':'')+'</p><p class="erro" id="er"></p>';
+ $("cat").onchange=function(){$("varbox").innerHTML=selVar($("cat").value,"")};
  if(p.id)$("canc").onclick=function(){form(null)};
  $("salvar").onclick=async function(){
   var preco=parseFloat($("preco").value.replace(",","."));
@@ -48,7 +51,7 @@ function form(p){
   if(!$("cat").value){$("er").textContent="Escolha a categoria.";return}
   if(!tamsMarcados()){$("er").textContent="Marque pelo menos um tamanho.";return}
   $("salvar").disabled=true;$("salvar").textContent="Salvando...";
-  var d={nome:$("nome").value.trim(),preco:preco,categoria:$("cat").value,tamanhos:tamsMarcados(),descricao:$("desc").value.trim(),ativo:$("ativo").checked,foto_url:p.foto_url||null};
+  var d={nome:$("nome").value.trim(),preco:preco,categoria:$("cat").value,variedade:($("vari")&&$("vari").value)||null,tamanhos:tamsMarcados(),descricao:$("desc").value.trim(),ativo:$("ativo").checked,foto_url:p.foto_url||null};
   var f=$("foto").files[0];
   if(f){var n=Date.now()+"-"+f.name.replace(/[^a-zA-Z0-9.]/g,"_");var u=await db.storage.from("fotos").upload(n,f);
    if(u.error){$("er").textContent="Erro ao enviar a foto.";$("salvar").disabled=false;$("salvar").textContent="Salvar";return}
