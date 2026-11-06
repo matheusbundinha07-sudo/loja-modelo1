@@ -4,7 +4,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="config.js"></script>
 <style>
-img.marca-txt{height:38px;width:auto;display:block;margin-left:10px}
+img.lema-img{display:block;width:min(560px,90%);height:auto;margin:0 0 10px}
 button.zap{border:0;font:inherit;cursor:pointer}
 .galeria{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 .galeria button{width:56px;height:70px;padding:0;border:2px solid transparent;border-radius:6px;overflow:hidden;background:#f2f2ef;cursor:pointer;opacity:.7}
@@ -42,13 +42,13 @@ button.cx-c{width:100%;border:0;font:inherit;font-weight:700;cursor:pointer}
 </head>
 <body>
 <div class="aviso">Enviamos · Todas as formas de pagamento</div>
-<header class="topo"><a class="marca" href="#"><img src="logo.png" alt=""><img class="marca-txt" src="logo-texto.png" alt="Quebrada Beckas Catálogo"></a>
+<header class="topo"><a class="marca" href="#"><img src="logo.png" alt=""><span id="logo"></span></a>
 <nav><a href="#">Catálogo</a><a id="contato" target="_blank" rel="noopener">Contato</a><button class="cx-btn" id="cxbtn" type="button" aria-label="Abrir carrinho">Carrinho<i id="cxn">0</i></button></nav></header>
 <main class="wrap" id="app">Carregando...</main>
 <div class="cx" id="cx"><div class="cx-ov" data-x></div><aside class="cx-p" role="dialog" aria-label="Carrinho"><div class="cx-h"><b>Carrinho</b><button type="button" data-x aria-label="Fechar">×</button></div><div class="cx-b" id="cxb"></div><div class="cx-f" id="cxf"><div class="cx-t"><span>Total</span><span id="cxt"></span></div><div class="cx-fm"><label for="cxnome">Nome *</label><input id="cxnome" autocomplete="name" placeholder="Seu nome"><label for="cxtel">Telefone (opcional)</label><input id="cxtel" type="tel" inputmode="tel" autocomplete="tel" placeholder="(32) 99999-9999"><p class="cx-e" id="cxe" role="alert"></p></div><button class="cx-c" id="cxc" type="button">Comprar</button><button class="cx-k" type="button" data-x>Continuar comprando</button></div></aside></div>
 <footer><span id="rod"></span><span>Pirapetinga-MG</span><a href="https://instagram.com/quebrada_beckas" target="_blank" rel="noopener">Instagram</a></footer>
 <script>
-document.title=LOJA+" | Catálogo";document.getElementById("rod").textContent="© "+LOJA;
+document.getElementById("logo").textContent=LOJA;document.title=LOJA+" | Catálogo";document.getElementById("rod").textContent="© "+LOJA;
 document.getElementById("contato").href="https://wa.me/"+WHATSAPP;
 var db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY),app=document.getElementById("app"),fi=0,P=[],cat="Todos",tam=null,sel=[],vari=null,aberto=null;
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
@@ -79,7 +79,7 @@ function lista(){
  var abas=cats.map(function(c){var v=VV[c],at=c===cat?" ativo":"";
   if(!v)return '<button class="aba'+at+'" data-c="'+esc(c)+'">'+esc(c)+'</button>';
   return '<div class="drop'+(aberto===c?" aberto":"")+'"><button class="aba'+at+'" data-c="'+esc(c)+'">'+esc(c)+'<span class="seta"></span></button><div class="menu"><button data-vc="'+esc(c)+'" data-v="" class="'+(c===cat&&!vari?"ativo":"")+'">Todas</button>'+v.map(function(x){return '<button data-vc="'+esc(c)+'" data-v="'+esc(x)+'" class="'+(c===cat&&vari===x?"ativo":"")+'">'+esc(x)+'</button>'}).join("")+'</div></div>'}).join("");
- app.innerHTML='<div class="intro"><p class="lema">A loja que fortalece os cria.</p><p class="local">Pirapetinga-MG</p></div><div class="abas">'+abas+'</div><div class="loja"><aside class="filtro"><h3>Tamanho</h3><div class="tams">'+TT.map(function(t){return '<button data-f="'+esc(t)+'" class="'+(sel.indexOf(t)>=0?"ativo":"")+'">'+esc(t)+'</button>'}).join("")+'</div>'+(sel.length?'<button class="limpar" id="limpar">Limpar filtro</button>':'')+'</aside><div><p class="conta">'+it.length+(it.length===1?" produto":" produtos")+(vari?" · "+esc(vari):"")+'</p>'+(it.length?'<div class="grade">'+it.map(function(p){return '<a class="card" href="#'+p.id+'">'+img(p)+'<h2>'+esc(p.nome)+'</h2><p>'+brl(p.preco)+'</p></a>'}).join("")+'</div>':'<p class="conta">Nenhum produto nesse tamanho.</p>')+'</div></div>';
+ app.innerHTML='<div class="intro"><img class="lema-img" src="logo-texto.png" alt="Quebrada Beckas Catálogo"><p class="local">Pirapetinga-MG</p></div><div class="abas">'+abas+'</div><div class="loja"><aside class="filtro"><h3>Tamanho</h3><div class="tams">'+TT.map(function(t){return '<button data-f="'+esc(t)+'" class="'+(sel.indexOf(t)>=0?"ativo":"")+'">'+esc(t)+'</button>'}).join("")+'</div>'+(sel.length?'<button class="limpar" id="limpar">Limpar filtro</button>':'')+'</aside><div><p class="conta">'+it.length+(it.length===1?" produto":" produtos")+(vari?" · "+esc(vari):"")+'</p>'+(it.length?'<div class="grade">'+it.map(function(p){return '<a class="card" href="#'+p.id+'">'+img(p)+'<h2>'+esc(p.nome)+'</h2><p>'+brl(p.preco)+'</p></a>'}).join("")+'</div>':'<p class="conta">Nenhum produto nesse tamanho.</p>')+'</div></div>';
  app.querySelectorAll("a.card").forEach(hoverFotos);
  app.querySelectorAll("[data-c]").forEach(function(b){b.onclick=function(){var c=b.dataset.c;aberto=VV[c]?(aberto===c?null:c):null;if(cat!==c){cat=c;vari=null;sel=[]}lista()}});
  app.querySelectorAll("[data-v]").forEach(function(b){b.onclick=function(){cat=b.dataset.vc;vari=b.dataset.v||null;sel=[];aberto=null;lista()}});
