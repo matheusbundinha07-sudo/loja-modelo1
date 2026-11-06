@@ -185,7 +185,7 @@ function prev(){
  const c=$("prevcol"),topo=`<div class="tel-top"><img src="logo.png" alt=""><b>${esc(LOJA)}</b></div>`;
  if(sel===null){c.innerHTML=`<p class="rot">A prévia do produto aparece aqui.</p>`;return}
  const f=d.file?urlNova:(!d.tirou&&d.foto_url);
- c.innerHTML=`<div class="tel">${topo}${f?`<img class="big" src="${esc(f)}" alt="">`:`<div class="ph big"></div>`}<div class="pad"><p class="rot">Prévia no celular</p><h3>${esc(d.nome)||"Nome do produto"}</h3><div class="pr">${brl(num(d.preco))}</div><p class="ds">${esc(d.descricao)}</p><div class="sz">${d.tamanhos.map(t=>`<span>${esc(t)}</span>`).join("")}</div><div class="zapb">Pedir pelo WhatsApp</div></div></div>`;
+ c.innerHTML=`<div class="tel">${topo}${f?`<img class="big" src="${esc(f)}" alt="">`:`<div class="ph big"></div>`}<div class="pad"><p class="rot">Prévia no celular</p><h3>${esc(d.nome)||"Nome do produto"}</h3><div class="pr">${brl(num(d.preco))}</div><p class="ds">${esc(d.descricao)}</p><div class="sz">${d.tamanhos.map(t=>`<span>${esc(t)}</span>`).join("")}</div><div class="zapb">Adicionar ao carrinho</div></div></div>`;
 }
 const SQL_VENDAS="alter table produtos add column if not exists vendas integer not null default 0;";
 const V=p=>Number(p.vendas)||0;
