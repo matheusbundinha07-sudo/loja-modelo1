@@ -21,10 +21,10 @@ var ORDEM=["PP","P","M","G","GG","XG","XGG","Único"];
 function ordem(a,b){var i=ORDEM.indexOf(a),j=ORDEM.indexOf(b);if(i<0&&j<0)return(parseFloat(a)||0)-(parseFloat(b)||0);if(i<0)return 1;if(j<0)return-1;return i-j}
 function lista(){
  if(!P.length){app.innerHTML="<p style='padding:24px 8px'>Nenhum produto cadastrado ainda.</p>";return}
- var cats=["Todos"].concat(P.map(function(p){return p.categoria}).filter(function(c,i,a){return c&&a.indexOf(c)===i}));
+ var cats=["Todos"].concat(P.some(function(p){return p.mais_vendido})?["Mais vendidos"]:[]).concat(P.map(function(p){return p.categoria}).filter(function(c,i,a){return c&&a.indexOf(c)===i}));
  var VV={};P.forEach(function(p){if(p.categoria&&p.variedade){VV[p.categoria]=VV[p.categoria]||[];if(VV[p.categoria].indexOf(p.variedade)<0)VV[p.categoria].push(p.variedade)}});
  for(var k in VV)VV[k].sort(function(a,b){return a.localeCompare(b,"pt")});
- var daCat=P.filter(function(p){return(cat==="Todos"||p.categoria===cat)&&(!vari||p.variedade===vari)});
+ var daCat=P.filter(function(p){return(cat==="Todos"||(cat==="Mais vendidos"?p.mais_vendido:p.categoria===cat))&&(!vari||p.variedade===vari)});
  var TT=[];daCat.forEach(function(p){tams(p).forEach(function(t){if(TT.indexOf(t)<0)TT.push(t)})});TT.sort(ordem);
  var it=daCat.filter(function(p){return !sel.length||tams(p).some(function(t){return sel.indexOf(t)>=0})});
  var abas=cats.map(function(c){var v=VV[c],at=c===cat?" ativo":"";
