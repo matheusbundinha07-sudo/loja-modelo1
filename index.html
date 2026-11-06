@@ -131,6 +131,8 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape")document.get
   erro("");
   try{localStorage.setItem("cliente_nome",nome);localStorage.setItem("cliente_tel",tel)}catch(x){}
   var msg="Nome: "+nome+"\nTelefone: "+(tel||"não informado")+"\n\nPedido:\n"+PEDIDO.linhas.join("\n")+"\n\nTotal: "+brl(PEDIDO.total);
+  var sig=nome+"|"+PEDIDO.total+"|"+PEDIDO.linhas.join();
+  if(window._ps!==sig){window._ps=sig;try{db.from("pedidos").insert({cliente_nome:nome,cliente_tel:tel||null,itens:CART.map(function(x){return{id:x.id,n:x.n,p:x.p,t:x.t,q:x.q}}),total:PEDIDO.total}).then(function(r){if(r.error)console.error(r.error)},function(){})}catch(x){}}
   var url="https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent(msg);
   if(!window.open(url,"_blank"))location.href=url;
  };
