@@ -5,6 +5,10 @@
 <script src="config.js"></script>
 <style>
 button.zap{border:0;font:inherit;cursor:pointer}
+.galeria{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.galeria button{width:56px;height:70px;padding:0;border:2px solid transparent;border-radius:6px;overflow:hidden;background:#f2f2ef;cursor:pointer;opacity:.7}
+.galeria button.ativo{border-color:#111;opacity:1}
+.galeria img{width:100%;height:100%;object-fit:cover;display:block}
 .cx-btn{border:0;background:none;font:inherit;color:inherit;cursor:pointer;padding:0}
 .cx-btn i{font-style:normal;display:inline-block;min-width:20px;padding:1px 6px;margin-left:4px;border-radius:10px;background:#111;color:#fff;font-size:.75rem;text-align:center}
 .cx{position:fixed;inset:0;z-index:50;display:none}.cx.on{display:block}
@@ -45,11 +49,22 @@ button.cx-c{width:100%;border:0;font:inherit;font-weight:700;cursor:pointer}
 <script>
 document.getElementById("logo").textContent=LOJA;document.title=LOJA+" | Catálogo";document.getElementById("rod").textContent="© "+LOJA;
 document.getElementById("contato").href="https://wa.me/"+WHATSAPP;
-var db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY),app=document.getElementById("app"),P=[],cat="Todos",tam=null,sel=[],vari=null,aberto=null;
+var db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY),app=document.getElementById("app"),fi=0,P=[],cat="Todos",tam=null,sel=[],vari=null,aberto=null;
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
 function brl(v){return Number(v).toLocaleString("pt-BR",{style:"currency",currency:"BRL"})}
 function tams(p){return String(p.tamanhos||"U").split(",").map(function(t){return t.trim()}).filter(Boolean)}
-function img(p){return p.foto_url?'<div class="foto"><img src="'+esc(p.foto_url)+'" alt="'+esc(p.nome)+'"></div>':'<div class="foto vazio"></div>'}
+function fotos(p){var f=Array.isArray(p.fotos)&&p.fotos.length?p.fotos:(p.foto_url?[p.foto_url]:[]);return f.filter(Boolean)}
+function img(p,i){var f=fotos(p);i=i||0;if(i>=f.length)i=0;return f.length?'<div class="foto"><img src="'+esc(f[i])+'" alt="'+esc(p.nome)+'"></div>':'<div class="foto vazio"></div>'}
+var HV=null;
+function hoverFotos(card){
+ var p=P.filter(function(x){return x.id===card.getAttribute("href").slice(1)})[0];if(!p)return;
+ var f=fotos(p);if(f.length<2)return;
+ var im=card.querySelector(".foto img"),k=0,t=null,pre=false;
+ function passo(){k=(k+1)%f.length;im.src=f[k]}
+ function entra(){if(!pre){pre=true;f.forEach(function(u){new Image().src=u})}clearInterval(t);passo();t=setInterval(passo,1000)}
+ function sai(){clearInterval(t);t=null;k=0;im.src=f[0]}
+ card.addEventListener("mouseenter",entra);card.addEventListener("mouseleave",sai);
+}
 var ORDEM=["PP","P","M","G","GG","XG","XGG","Único"];
 function ordem(a,b){var i=ORDEM.indexOf(a),j=ORDEM.indexOf(b);if(i<0&&j<0)return(parseFloat(a)||0)-(parseFloat(b)||0);if(i<0)return 1;if(j<0)return-1;return i-j}
 function lista(){
@@ -64,6 +79,7 @@ function lista(){
   if(!v)return '<button class="aba'+at+'" data-c="'+esc(c)+'">'+esc(c)+'</button>';
   return '<div class="drop'+(aberto===c?" aberto":"")+'"><button class="aba'+at+'" data-c="'+esc(c)+'">'+esc(c)+'<span class="seta"></span></button><div class="menu"><button data-vc="'+esc(c)+'" data-v="" class="'+(c===cat&&!vari?"ativo":"")+'">Todas</button>'+v.map(function(x){return '<button data-vc="'+esc(c)+'" data-v="'+esc(x)+'" class="'+(c===cat&&vari===x?"ativo":"")+'">'+esc(x)+'</button>'}).join("")+'</div></div>'}).join("");
  app.innerHTML='<div class="intro"><p class="lema">A loja que fortalece os cria.</p><p class="local">Pirapetinga-MG</p></div><div class="abas">'+abas+'</div><div class="loja"><aside class="filtro"><h3>Tamanho</h3><div class="tams">'+TT.map(function(t){return '<button data-f="'+esc(t)+'" class="'+(sel.indexOf(t)>=0?"ativo":"")+'">'+esc(t)+'</button>'}).join("")+'</div>'+(sel.length?'<button class="limpar" id="limpar">Limpar filtro</button>':'')+'</aside><div><p class="conta">'+it.length+(it.length===1?" produto":" produtos")+(vari?" · "+esc(vari):"")+'</p>'+(it.length?'<div class="grade">'+it.map(function(p){return '<a class="card" href="#'+p.id+'">'+img(p)+'<h2>'+esc(p.nome)+'</h2><p>'+brl(p.preco)+'</p></a>'}).join("")+'</div>':'<p class="conta">Nenhum produto nesse tamanho.</p>')+'</div></div>';
+ app.querySelectorAll("a.card").forEach(hoverFotos);
  app.querySelectorAll("[data-c]").forEach(function(b){b.onclick=function(){var c=b.dataset.c;aberto=VV[c]?(aberto===c?null:c):null;if(cat!==c){cat=c;vari=null;sel=[]}lista()}});
  app.querySelectorAll("[data-v]").forEach(function(b){b.onclick=function(){cat=b.dataset.vc;vari=b.dataset.v||null;sel=[];aberto=null;lista()}});
  app.querySelectorAll("[data-f]").forEach(function(b){b.onclick=function(){var t=b.dataset.f,i=sel.indexOf(t);if(i<0)sel.push(t);else sel.splice(i,1);lista()}});
@@ -120,11 +136,13 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape")document.get
 cartUI();
 function prod(p){
  var T=tams(p);if(!tam||T.indexOf(tam)<0)tam=T[0];
- app.innerHTML='<a class="voltar" href="#">← Voltar</a><div class="detalhe">'+img(p)+'<div class="info"><h1>'+esc(p.nome)+'</h1><p class="preco">'+brl(p.preco)+'</p><p>'+esc(p.descricao)+'</p><p class="rotulo">Tamanho</p><div class="tams">'+T.map(function(t){return '<button data-t="'+esc(t)+'" class="'+(t===tam?"ativo":"")+'">'+esc(t)+'</button>'}).join("")+'</div><button class="zap" id="addc" type="button">Adicionar ao carrinho</button></div></div>';
+ var F=fotos(p);if(fi>=F.length)fi=0;
+ app.innerHTML='<a class="voltar" href="#">← Voltar</a><div class="detalhe"><div>'+img(p,fi)+(F.length>1?'<div class="galeria">'+F.map(function(u,i){return '<button type="button" data-i="'+i+'" class="'+(i===fi?"ativo":"")+'" aria-label="Foto '+(i+1)+'"><img src="'+esc(u)+'" alt=""></button>'}).join("")+'</div>':'')+'</div><div class="info"><h1>'+esc(p.nome)+'</h1><p class="preco">'+brl(p.preco)+'</p><p>'+esc(p.descricao)+'</p><p class="rotulo">Tamanho</p><div class="tams">'+T.map(function(t){return '<button data-t="'+esc(t)+'" class="'+(t===tam?"ativo":"")+'">'+esc(t)+'</button>'}).join("")+'</div><button class="zap" id="addc" type="button">Adicionar ao carrinho</button></div></div>';
  app.querySelectorAll("[data-t]").forEach(function(b){b.onclick=function(){tam=b.dataset.t;prod(p)}});
+ app.querySelectorAll("[data-i]").forEach(function(b){b.onclick=function(){fi=+b.dataset.i;prod(p)}});
  document.getElementById("addc").onclick=function(){addCart(p,tam)};
 }
-function rota(){var id=location.hash.slice(1),p=P.filter(function(x){return x.id===id})[0];if(p){tam=null;prod(p)}else lista();scrollTo(0,0)}
+function rota(){var id=location.hash.slice(1),p=P.filter(function(x){return x.id===id})[0];if(p){tam=null;fi=0;prod(p)}else lista();scrollTo(0,0)}
 db.from("produtos").select("*").eq("ativo",true).order("criado",{ascending:false}).then(function(r){
  if(r.error){app.textContent="Não foi possível carregar o catálogo.";return}
  P=r.data;CART.forEach(function(i){var p=P.filter(function(x){return x.id===i.id})[0];if(p){i.n=p.nome;i.p=Number(p.preco);i.f=p.foto_url||""}});salvaCart();cartUI();rota();addEventListener("hashchange",rota);

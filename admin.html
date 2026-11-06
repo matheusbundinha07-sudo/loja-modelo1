@@ -44,6 +44,14 @@ button:disabled{opacity:.6}
 .vazio2{padding:32px 24px;color:var(--mut)}
 .fotobox{display:flex;gap:12px;align-items:center;margin-bottom:8px}
 .fotobox img,.fotobox .th{width:64px;height:80px}.fotobox span{font-size:.8rem;color:var(--mut)}.fotobox .sec{padding:4px 10px;font-size:.8rem;margin-top:6px}
+.fgrid{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:8px}
+.fi{position:relative;width:76px}
+.fi img{width:76px;height:95px;object-fit:cover;border-radius:6px;border:1px solid var(--line);background:var(--pap);display:block}
+.fi .cv{position:absolute;top:4px;left:4px;font-style:normal;font-size:.65rem;font-weight:700;background:#111;color:#fff;border-radius:4px;padding:1px 6px}
+.fi .fb{display:flex;gap:2px;margin-top:4px}
+.fi .fb button{flex:1;padding:3px 0;font-size:.7rem;border:1px solid #d6d6d1;border-radius:5px;background:#fff;line-height:1.2}
+.fi .fb button:disabled{opacity:.35;cursor:default}
+.fdica{font-size:.78rem;color:var(--mut);margin:0 0 8px}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chips label{position:relative;margin:0;color:var(--ink);cursor:pointer}
 .chips input{position:absolute;opacity:0;width:0;height:0}
@@ -143,25 +151,29 @@ function rows(){
  $("rows").querySelectorAll(".it").forEach(r=>r.onclick=()=>abrir(r.dataset.id));
 }
 function abrir(id){
- sel=id;if(urlNova){URL.revokeObjectURL(urlNova);urlNova=null}
+ sel=id;if(d.fotos)d.fotos.forEach(f=>{if(f.file)URL.revokeObjectURL(f.url)})
  const p=id==="novo"?{ativo:true}:itens.find(x=>x.id===id);
- d={nome:p.nome||"",preco:p.preco!=null?String(p.preco).replace(".",","):"",categoria:p.categoria||"",variedade:p.variedade||"",tamanhos:tams(p.tamanhos),descricao:p.descricao||"",ativo:p.ativo!==false,mais_vendido:!!p.mais_vendido,foto_url:p.foto_url||null,file:null,tirou:false};
+ d={nome:p.nome||"",preco:p.preco!=null?String(p.preco).replace(".",","):"",categoria:p.categoria||"",variedade:p.variedade||"",tamanhos:tams(p.tamanhos),descricao:p.descricao||"",ativo:p.ativo!==false,mais_vendido:!!p.mais_vendido,fotos:(Array.isArray(p.fotos)&&p.fotos.length?p.fotos:(p.foto_url?[p.foto_url]:[])).map(u=>({url:u}))};
  $("app").classList.add("edit");rows();editor();prev();$("editor").scrollTop=0;scrollTo(0,0);
 }
 function selCat(v){const l=CATEGORIAS.slice();if(v&&!l.includes(v))l.push(v);return `<select id="cat"><option value="">Escolha...</option>${l.map(c=>`<option${c===v?" selected":""}>${esc(c)}</option>`).join("")}</select>`}
 function selVar(c,v){const l=(VARIEDADES[c]||[]).slice();if(v&&!l.includes(v))l.push(v);if(!l.length)return"";return `<label>Variedade</label><select id="vari"><option value="">Nenhuma</option>${l.map(x=>`<option${x===v?" selected":""}>${esc(x)}</option>`).join("")}</select>`}
 function chips(){const l=TAMANHOS.slice();d.tamanhos.forEach(t=>{if(!l.includes(t))l.push(t)});return `<div class="chips">${l.map(t=>`<label><input type="checkbox" name="tam" value="${esc(t)}"${d.tamanhos.includes(t)?" checked":""}><span>${esc(t)}</span></label>`).join("")}</div>`}
 function fotoUI(){
- const f=d.file,src=f?urlNova:(!d.tirou&&d.foto_url);
- $("fotobox").innerHTML=(src?`<img src="${esc(src)}" alt="">`:`<div class="th"></div>`)+`<div><span>${f?"Nova foto (ainda não salva)":src?"Foto atual":d.tirou?"A foto será removida ao salvar.":"Sem foto"}</span><br>`+(src?`<button type="button" class="sec" id="rem">Remover</button>`:(d.tirou?`<button type="button" class="sec" id="rem">Desfazer</button>`:""))+`</div>`;
- if($("rem"))$("rem").onclick=()=>{if(d.file){d.file=null;$("foto").value=""}else d.tirou=!d.tirou;fotoUI();prev()};
+ const F=d.fotos,box=$("fotobox");
+ box.innerHTML=F.length?`<div class="fgrid">${F.map((f,i)=>`<div class="fi" data-i="${i}"><img src="${esc(f.url)}" alt="">${i===0?`<em class="cv">Capa</em>`:""}<div class="fb"><button type="button" data-m="-1"${i===0?" disabled":""} aria-label="Mover para a esquerda">◀</button><button type="button" data-m="1"${i===F.length-1?" disabled":""} aria-label="Mover para a direita">▶</button><button type="button" data-r="1" aria-label="Remover foto">×</button></div></div>`).join("")}</div><p class="fdica">${F.some(f=>f.file)?"Fotos novas só são salvas ao clicar em Salvar. ":""}No site, ao passar o mouse, as fotos trocam na ordem mostrada aqui.</p>`:`<p class="fdica">Sem foto. Escolha uma ou mais abaixo.</p>`;
+ box.querySelectorAll(".fi").forEach(el=>{
+  const i=+el.dataset.i;
+  el.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>{const k=i+Number(b.dataset.m);if(k<0||k>=F.length)return;[F[i],F[k]]=[F[k],F[i]];fotoUI();prev()});
+  el.querySelector("[data-r]").onclick=()=>{const f=F.splice(i,1)[0];if(f.file)URL.revokeObjectURL(f.url);fotoUI();prev()};
+ });
 }
 function editor(){
  const ed=$("editor");
  if(sel===null){ed.innerHTML=`<div class="vazio2"><p>Escolha um produto na lista ou clique em “+ Novo produto”.</p></div>`;return}
  const novo=sel==="novo";
  ed.innerHTML=`<div class="edhead"><b>${novo?"Novo produto":"Editar produto"}</b><button class="x" id="fechar" aria-label="Fechar">×</button></div>
-<div class="fld"><label>Foto</label><div class="fotobox" id="fotobox"></div><input id="foto" type="file" accept="image/*"></div>
+<div class="fld"><label>Fotos (a 1ª é a capa)</label><div id="fotobox"></div><input id="foto" type="file" accept="image/*" multiple></div>
 <div class="fld"><label>Nome</label><input id="nome" value="${esc(d.nome)}"></div>
 <div class="fld"><label>Preço (ex: 129,90)</label><input id="preco" inputmode="decimal" value="${esc(d.preco)}"></div>
 <div class="fld"><label>Categoria</label>${selCat(d.categoria)}<div id="varbox">${selVar(d.categoria,d.variedade)}</div></div>
@@ -177,15 +189,15 @@ function editor(){
   else if(t.id==="vari")d.variedade=t.value;
   else if(t.name==="tam")d.tamanhos=[...ed.querySelectorAll("input[name=tam]:checked")].map(i=>i.value);
   else if(t.id==="ativo")d.ativo=t.checked;else if(t.id==="mv")d.mais_vendido=t.checked;
-  else if(t.id==="foto"){if(urlNova){URL.revokeObjectURL(urlNova);urlNova=null}d.file=t.files[0]||null;if(d.file)urlNova=URL.createObjectURL(d.file);d.tirou=false;fotoUI()}
+  else if(t.id==="foto"){[...t.files].forEach(f=>d.fotos.push({file:f,url:URL.createObjectURL(f)}));t.value="";fotoUI()}
   prev()};
  $("salvar").onclick=salvar;if($("excluir"))$("excluir").onclick=excluir;
 }
 function prev(){
  const c=$("prevcol"),topo=`<div class="tel-top"><img src="logo.png" alt=""><b>${esc(LOJA)}</b></div>`;
  if(sel===null){c.innerHTML=`<p class="rot">A prévia do produto aparece aqui.</p>`;return}
- const f=d.file?urlNova:(!d.tirou&&d.foto_url);
- c.innerHTML=`<div class="tel">${topo}${f?`<img class="big" src="${esc(f)}" alt="">`:`<div class="ph big"></div>`}<div class="pad"><p class="rot">Prévia no celular</p><h3>${esc(d.nome)||"Nome do produto"}</h3><div class="pr">${brl(num(d.preco))}</div><p class="ds">${esc(d.descricao)}</p><div class="sz">${d.tamanhos.map(t=>`<span>${esc(t)}</span>`).join("")}</div><div class="zapb">Adicionar ao carrinho</div></div></div>`;
+ const f=d.fotos[0]&&d.fotos[0].url;
+ c.innerHTML=`<div class="tel">${topo}${f?`<img class="big" src="${esc(f)}" alt="">`:`<div class="ph big"></div>`}<div class="pad"><p class="rot">Prévia no celular${d.fotos.length>1?" · "+d.fotos.length+" fotos":""}</p><h3>${esc(d.nome)||"Nome do produto"}</h3><div class="pr">${brl(num(d.preco))}</div><p class="ds">${esc(d.descricao)}</p><div class="sz">${d.tamanhos.map(t=>`<span>${esc(t)}</span>`).join("")}</div><div class="zapb">Adicionar ao carrinho</div></div></div>`;
 }
 const SQL_VENDAS="alter table produtos add column if not exists vendas integer not null default 0;";
 const V=p=>Number(p.vendas)||0;
@@ -220,13 +232,18 @@ async function salvar(){
  if(erro){msg.className="msg err";msg.textContent=erro;return}
  const b=$("salvar");b.disabled=true;b.textContent="Salvando...";
  const falha=t=>{msg.className="msg err";msg.textContent=t;b.disabled=false;b.textContent="Salvar"};
- let foto=d.tirou?null:d.foto_url;
- if(d.file){const n=Date.now()+"-"+d.file.name.replace(/[^a-zA-Z0-9.]/g,"_");const u=await db.storage.from("fotos").upload(n,d.file);if(u.error){falha("Erro ao enviar a foto.");return}foto=db.storage.from("fotos").getPublicUrl(n).data.publicUrl}
- const row={nome:d.nome.trim(),preco,categoria:d.categoria,variedade:d.variedade||null,tamanhos:d.tamanhos.join(", "),descricao:d.descricao.trim(),ativo:d.ativo,mais_vendido:d.mais_vendido,foto_url:foto};
- const r=sel==="novo"?await db.from("produtos").insert(row).select().single():await db.from("produtos").update(row).eq("id",sel).select().single();
+ const urls=[];let k=0;
+ for(const f of d.fotos){
+  if(f.file){const n=Date.now()+"-"+(k++)+"-"+f.file.name.replace(/[^a-zA-Z0-9.]/g,"_");const u=await db.storage.from("fotos").upload(n,f.file);if(u.error){falha("Erro ao enviar a foto.");return}urls.push(db.storage.from("fotos").getPublicUrl(n).data.publicUrl)}
+  else urls.push(f.url);
+ }
+ const row={nome:d.nome.trim(),preco,categoria:d.categoria,variedade:d.variedade||null,tamanhos:d.tamanhos.join(", "),descricao:d.descricao.trim(),ativo:d.ativo,mais_vendido:d.mais_vendido,foto_url:urls[0]||null,fotos:urls};
+ const grava=x=>sel==="novo"?db.from("produtos").insert(x).select().single():db.from("produtos").update(x).eq("id",sel).select().single();
+ let r=await grava(row),semCol=false;
+ if(r.error&&/fotos/i.test(r.error.message||"")){delete row.fotos;semCol=true;r=await grava(row)}
  if(r.error){falha("Erro ao salvar. Confira o passo do Supabase ou entre de novo.");return}
  const l=await db.from("produtos").select("*").order("criado",{ascending:false});if(!l.error)itens=l.data;
- aviso="Salvo!";lista();abrir(r.data.id);
+ aviso=semCol&&urls.length>1?"Salvo só com a capa: falta criar a coluna 'fotos' no Supabase.":"Salvo!";lista();abrir(r.data.id);
 }
 async function excluir(){if(!confirm("Excluir este produto?"))return;const r=await db.from("produtos").delete().eq("id",sel);if(r.error){alert("Erro ao excluir.");return}sel=null;carregar()}
 db.auth.getSession().then(r=>r.data.session?carregar():login());
