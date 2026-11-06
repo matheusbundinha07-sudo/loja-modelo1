@@ -42,13 +42,13 @@ button.cx-c{width:100%;border:0;font:inherit;font-weight:700;cursor:pointer}
 </head>
 <body>
 <div class="aviso">Enviamos · Todas as formas de pagamento</div>
-<header class="topo"><a class="marca" href="#"><img src="logo.png" alt=""><span id="logo"></span></a>
+<header class="topo"><a class="marca" href="#"><img src="logo.png" alt="Quebrada Beckas"></a>
 <nav><a href="#">Catálogo</a><a id="contato" target="_blank" rel="noopener">Contato</a><button class="cx-btn" id="cxbtn" type="button" aria-label="Abrir carrinho">Carrinho<i id="cxn">0</i></button></nav></header>
 <main class="wrap" id="app">Carregando...</main>
 <div class="cx" id="cx"><div class="cx-ov" data-x></div><aside class="cx-p" role="dialog" aria-label="Carrinho"><div class="cx-h"><b>Carrinho</b><button type="button" data-x aria-label="Fechar">×</button></div><div class="cx-b" id="cxb"></div><div class="cx-f" id="cxf"><div class="cx-t"><span>Total</span><span id="cxt"></span></div><div class="cx-fm"><label for="cxnome">Nome *</label><input id="cxnome" autocomplete="name" placeholder="Seu nome"><label for="cxtel">Telefone (opcional)</label><input id="cxtel" type="tel" inputmode="tel" autocomplete="tel" placeholder="(32) 99999-9999"><p class="cx-e" id="cxe" role="alert"></p></div><button class="cx-c" id="cxc" type="button">Comprar</button><button class="cx-k" type="button" data-x>Continuar comprando</button></div></aside></div>
 <footer><span id="rod"></span><span>Pirapetinga-MG</span><a href="https://instagram.com/quebrada_beckas" target="_blank" rel="noopener">Instagram</a></footer>
 <script>
-document.getElementById("logo").textContent=LOJA;document.title=LOJA+" | Catálogo";document.getElementById("rod").textContent="© "+LOJA;
+document.title=LOJA+" | Catálogo";document.getElementById("rod").textContent="© "+LOJA;
 document.getElementById("contato").href="https://wa.me/"+WHATSAPP;
 var db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY),app=document.getElementById("app"),fi=0,P=[],cat="Todos",tam=null,sel=[],vari=null,aberto=null;
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
