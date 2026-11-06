@@ -85,6 +85,14 @@ button:disabled{opacity:.6}
 .rk+.rk{border-top:1px solid var(--line)}
 .rk .n{color:var(--mut);font-weight:700;text-align:center}
 .rk .l{display:flex;justify-content:space-between;gap:12px;margin-bottom:6px}.rk .l b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rk .l span{font-weight:700;white-space:nowrap}
+.mg{padding:8px 18px 14px}
+.mrow{padding:10px 0}
+.mrow+.mrow{border-top:1px solid var(--line)}
+.ml{display:flex;align-items:baseline;gap:10px;margin-bottom:7px}
+.ml b{flex:1;min-width:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mn{color:var(--mut);font-weight:700;min-width:24px}
+.mq{font-weight:700;white-space:nowrap;font-size:.9rem}
+.mrow:first-child .bar i{background:#e0a800}
 .bar{height:10px;background:var(--pap);border-radius:5px;overflow:hidden}.bar i{display:block;height:100%;background:#111;border-radius:5px}
 .rk:first-of-type .bar i{background:#e0a800}
 .vazio3{padding:28px 18px;color:var(--mut);margin:0}
@@ -129,10 +137,22 @@ button:disabled{opacity:.6}
 .loja{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:18px;align-items:start;margin-bottom:18px}
 .loja .box{margin-bottom:0}
 .lp{display:flex;gap:12px;align-items:center;padding:10px 18px;border-top:1px solid var(--line)}
-.lp .inf span{display:block}
-.ltam{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
-.ltam button{min-width:40px;height:34px;padding:0 10px;border:1px solid #d6d6d1;border-radius:8px;background:#fff}
-.ltam button:hover{background:#111;color:#fff;border-color:#111}
+.lp>img,.lp>.th{width:48px;height:60px;object-fit:cover;border-radius:8px;background:var(--pap);flex:none}
+.lp .inf{flex:1;min-width:0}
+.lp .inf b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lp .inf span{display:block;color:var(--mut);font-size:.85rem}
+.lp.sel{background:#fafaf8}
+.ltam{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center}
+.ltam button{min-width:38px;height:32px;padding:0 10px;border:1px solid #d6d6d1;border-radius:8px;background:#fff;font-size:.85rem}
+.ltam button:hover{border-color:#111}
+.ltam button.on{background:#111;color:#fff;border-color:#111}
+.ltam .add{margin-left:auto;background:#1b7f3b;color:#fff;border-color:#1b7f3b;font-weight:600;padding:0 14px}
+.ltam .add:hover{background:#166b32;border-color:#166b32}
+#lcart{position:sticky;top:12px}
+#lcart .vr{padding:14px 18px}
+#lcart .vr .inf b{display:block}
+#lcart .vr .inf span{color:var(--mut);font-size:.85rem}
+#lcart .step button{border-radius:50%}
 .ltot{display:flex;justify-content:space-between;align-items:center;margin:14px 0;font-size:1.1rem}.ltot b{font-size:1.5rem}
 .lok{background:#e6f6ea;color:#1b7f3b;padding:10px 18px;font-weight:600;border-bottom:1px solid var(--line)}
 .lbusca{padding:12px 18px}
@@ -248,22 +268,15 @@ const SQL_VENDAS="alter table produtos add column if not exists vendas integer n
 const V=p=>Number(p.vendas)||0;
 function vendidos(){
  const tem=!itens.length||"vendas" in itens[0];
- const rank=itens.slice().sort((a,b)=>V(b)-V(a)||a.nome.localeCompare(b.nome,"pt"));
- const com=rank.filter(p=>V(p)>0),top=com.slice(0,8),max=top.length?V(top[0]):1;
- const total=itens.reduce((s,p)=>s+V(p),0),rec=itens.reduce((s,p)=>s+V(p)*(Number(p.preco)||0),0);
- const grafico=top.length?`<div role="list">${top.map((p,i)=>`<div class="rk" role="listitem"><span class="n">${i+1}º</span>${thumb(p)}<div><div class="l"><b>${esc(p.nome)}</b><span>${V(p)} ${V(p)===1?"venda":"vendas"}</span></div><div class="bar"><i style="width:${Math.max(3,V(p)/max*100)}%"></i></div></div></div>`).join("")}</div>`:`<p class="vazio3">Nenhuma venda registrada ainda. Use o <b>+</b> na lista abaixo toda vez que vender um produto e o gráfico aparece aqui.</p>`;
- $("vend").innerHTML=`<h1>Mais vendidos</h1><p class="sub">Veja quais produtos estão saindo mais e registre as vendas.</p>
+ const com=itens.filter(p=>V(p)>0).sort((x,y)=>V(y)-V(x)||x.nome.localeCompare(y.nome,"pt"));
+ const top=com.slice(0,10),max=top.length?V(top[0]):1;
+ const total=com.reduce((s,p)=>s+V(p),0),rec=com.reduce((s,p)=>s+V(p)*(Number(p.preco)||0),0);
+ const grafico=top.length?`<div class="mg" role="list">${top.map((p,i)=>`<div class="mrow" role="listitem"><div class="ml"><span class="mn">${i+1}º</span><b title="${esc(p.nome)}">${esc(p.nome)}</b><span class="mq">${V(p)} ${V(p)===1?"venda":"vendas"} · ${Math.round(V(p)/total*100)}%</span></div><div class="bar"><i style="width:${Math.max(3,V(p)/max*100)}%"></i></div></div>`).join("")}</div>`:`<p class="vazio3">Nenhuma venda ainda. Assim que você finalizar vendas no Caixa, o gráfico aparece aqui.</p>`;
+ $("vend").innerHTML=`<h1>Mais vendidos</h1><p class="sub">Só o que já foi vendido, em números.</p>
 ${tem?"":`<div class="warn"><b>Falta um passo no Supabase para contar as vendas.</b> Abra o SQL Editor, cole o comando abaixo e clique em Run. Depois atualize esta página.<code>${SQL_VENDAS}</code><button class="sec" id="cp">Copiar comando</button></div>`}
-<div class="cards"><div class="kpi"><small>Total de vendas</small><b>${total}</b></div><div class="kpi"><small>Receita estimada</small><b>${brl(rec)}</b></div><div class="kpi"><small>Produto líder</small><b>${com.length?esc(com[0].nome):"—"}</b></div></div>
-<div class="box"><h2>Ranking de vendas<small>top 8</small></h2>${grafico}</div>
-<div class="box"><h2>Registrar vendas<small>★ = aparece na aba “Mais vendidos” do site</small></h2>${rank.map(p=>`<div class="vr" data-id="${p.id}">${thumb(p)}<div class="inf"><b>${esc(p.nome)}</b><span>${brl(Number(p.preco))}${p.categoria?" · "+esc(p.categoria):""}</span></div><div class="step"><button data-m="-1" aria-label="Menos uma venda"${tem?"":" disabled"}>−</button><input type="number" min="0" inputmode="numeric" value="${V(p)}" aria-label="Vendas de ${esc(p.nome)}"${tem?"":" disabled"}><button data-m="1" aria-label="Mais uma venda"${tem?"":" disabled"}>+</button></div><div><button class="star${p.mais_vendido?" on":""}" data-s="1" aria-label="Mostrar no site como mais vendido" aria-pressed="${!!p.mais_vendido}">★</button></div></div>`).join("")||`<p class="vazio3">Nenhum produto cadastrado.</p>`}</div>`;
+<div class="cards"><div class="kpi"><small>Peças vendidas</small><b>${total}</b></div><div class="kpi"><small>Receita estimada</small><b>${brl(rec)}</b></div><div class="kpi"><small>Produto líder</small><b>${com.length?esc(com[0].nome):"—"}</b></div></div>
+<div class="box"><h2>Ranking de vendas<small>${com.length>10?"top 10":"por produto"}</small></h2>${grafico}</div>`;
  if($("cp"))$("cp").onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(SQL_VENDAS);$("cp").textContent="Copiado!"};
- $("vend").querySelectorAll(".vr").forEach(r=>{
-  const p=itens.find(x=>x.id===r.dataset.id);
-  r.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>setVendas(p,V(p)+Number(b.dataset.m)));
-  const i=r.querySelector("input");i.onchange=()=>setVendas(p,Number(i.value));
-  r.querySelector("[data-s]").onclick=async()=>{const v=!p.mais_vendido;const x=await db.from("produtos").update({mais_vendido:v}).eq("id",p.id);if(x.error){alert("Erro ao salvar.");return}p.mais_vendido=v;base()};
- });
 }
 async function setVendas(p,n){
  n=Math.max(0,Math.floor(n)||0);
@@ -373,15 +386,22 @@ ${semPed?AVISO_LOJA:""}
  $("lbusca").oninput=e=>{buscaL=e.target.value;lProds()};
  lProds();lCart();lHoje();
 }
+var selL=null;
 function lProds(){
  const q=buscaL.toLowerCase(),l=itens.filter(p=>p.nome.toLowerCase().includes(q));
  $("lprods").innerHTML=l.map(p=>{const T=tams(p.tamanhos);if(!T.length)T.push("Único");
-  return `<div class="lp" data-id="${esc(p.id)}">${thumb(p)}<div class="inf"><b>${esc(p.nome)}</b><span>${brl(Number(p.preco))}${p.ativo?"":" · oculto no site"}</span><div class="ltam">${T.map(t=>`<button type="button" data-t="${esc(t)}">${esc(t)}</button>`).join("")}</div></div></div>`}).join("")||`<p class="vazio3">Nenhum produto encontrado.</p>`;
+  const sl=selL&&String(selL.id)===String(p.id)?selL.t:null;
+  return `<div class="lp${sl?" sel":""}" data-id="${esc(p.id)}">${thumb(p)}<div class="inf"><b>${esc(p.nome)}</b><span>${brl(Number(p.preco))}${p.categoria?" · "+esc(p.categoria):""}${p.ativo?"":" · oculto no site"}</span><div class="ltam">${T.map(t=>`<button type="button" data-t="${esc(t)}" class="${sl===t?"on":""}">${esc(t)}</button>`).join("")}${sl?`<button type="button" class="add" data-add="1">+ Adicionar ${esc(sl)}</button>`:""}</div></div></div>`}).join("")||`<p class="vazio3">Nenhum produto encontrado.</p>`;
  $("lprods").querySelectorAll(".lp").forEach(r=>{const p=itens.find(x=>String(x.id)===r.dataset.id);
   r.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{
-   const t=b.dataset.t,i=cartL.find(x=>String(x.id)===String(p.id)&&x.t===t);
+   const t=b.dataset.t;
+   selL=(selL&&String(selL.id)===String(p.id)&&selL.t===t)?null:{id:p.id,t:t};
+   lProds()});
+  const ad=r.querySelector("[data-add]");
+  if(ad)ad.onclick=()=>{
+   const t=selL.t,i=cartL.find(x=>String(x.id)===String(p.id)&&x.t===t);
    if(i)i.q++;else cartL.push({id:p.id,n:p.nome,p:Number(p.preco)||0,t:t,q:1});
-   flashL="";lCart()})});
+   selL=null;flashL="";lProds();lCart()}});
 }
 function lCart(){
  const tot=cartL.reduce((s,i)=>s+i.p*i.q,0),qt=cartL.reduce((s,i)=>s+i.q,0);
