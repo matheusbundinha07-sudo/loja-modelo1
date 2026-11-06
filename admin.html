@@ -241,7 +241,7 @@ async function salvar(){
  const grava=x=>sel==="novo"?db.from("produtos").insert(x).select().single():db.from("produtos").update(x).eq("id",sel).select().single();
  let r=await grava(row),semCol=false;
  if(r.error&&/fotos/i.test(r.error.message||"")){delete row.fotos;semCol=true;r=await grava(row)}
- if(r.error){falha("Erro ao salvar. Confira o passo do Supabase ou entre de novo.");return}
+ if(r.error){console.error(r.error);falha("Erro ao salvar: "+(r.error.message||"desconhecido")+". Se falar em sessão/permissão, clique em Sair e entre de novo.");return}
  const l=await db.from("produtos").select("*").order("criado",{ascending:false});if(!l.error)itens=l.data;
  aviso=semCol&&urls.length>1?"Salvo só com a capa: falta criar a coluna 'fotos' no Supabase.":"Salvo!";lista();abrir(r.data.id);
 }
