@@ -11,6 +11,7 @@ select{width:100%;font:inherit;padding:10px;border:1px solid #c9c9c5;border-radi
 .chips input:focus-visible+span{outline:2px solid var(--texto);outline-offset:2px}
 .prev{display:flex;align-items:flex-end;gap:10px;margin-top:10px}
 .prev img{width:120px;aspect-ratio:4/5;object-fit:cover;background:var(--papel)}
+.prev button{padding:4px 10px;font-size:.8rem;margin-top:6px}
 .prev span{font-size:.85rem;color:var(--suave)}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
@@ -46,11 +47,13 @@ async function painel(){
 function form(p){
  p=p||{};
  $("form").innerHTML='<h2>'+(p.id?"Editar produto":"Novo produto")+'</h2><label>Nome</label><input id="nome" value="'+esc(p.nome)+'"><label>Preço (ex: 129,90)</label><input id="preco" value="'+(p.preco!=null?String(p.preco).replace(".",","):"")+'"><label>Categoria</label>'+selCat(p.categoria)+'<div id="varbox">'+selVar(p.categoria,p.variedade)+'</div><label>Tamanhos (marque os que tem)</label>'+chipsTam(p.tamanhos)+'<label>Descrição</label><textarea id="desc" rows="3">'+esc(p.descricao)+'</textarea><label>Foto'+(p.foto_url?' (já tem uma; escolha outra para trocar)':'')+'</label><input id="foto" type="file" accept="image/*"><div id="prev" class="prev"></div><div class="chk"><input id="ativo" type="checkbox" '+(p.id&&!p.ativo?'':'checked')+'><span>Mostrar no catálogo</span></div><p><button class="principal" id="salvar">Salvar</button> '+(p.id?'<button id="canc">Cancelar</button>':'')+'</p><p class="erro" id="er"></p>';
- var urlNova=null;
- function prev(){var d=$("prev"),f=$("foto").files[0];if(urlNova){URL.revokeObjectURL(urlNova);urlNova=null}
-  if(f){urlNova=URL.createObjectURL(f);d.innerHTML='<img src="'+urlNova+'" alt=""><span>Nova foto (ainda não salva)</span>'}
-  else if(p.foto_url){d.innerHTML='<img src="'+esc(p.foto_url)+'" alt=""><span>Foto atual</span>'}
-  else d.innerHTML=""}
+ var urlNova=null,tirou=false;
+ function prev(){var d=$("prev"),f=$("foto").files[0],h="";if(urlNova){URL.revokeObjectURL(urlNova);urlNova=null}
+  if(f){urlNova=URL.createObjectURL(f);h='<img src="'+urlNova+'" alt=""><div><span>Nova foto (ainda não salva)</span><br><button type="button" id="rem">Remover</button></div>'}
+  else if(p.foto_url&&!tirou){h='<img src="'+esc(p.foto_url)+'" alt=""><div><span>Foto atual</span><br><button type="button" id="rem">Remover foto</button></div>'}
+  else if(p.foto_url&&tirou){h='<div><span>A foto será removida ao salvar.</span><br><button type="button" id="rem">Desfazer</button></div>'}
+  d.innerHTML=h;
+  if($("rem"))$("rem").onclick=function(){if($("foto").files[0])$("foto").value="";else tirou=!tirou;prev()}}
  $("foto").onchange=prev;prev();
  $("cat").onchange=function(){$("varbox").innerHTML=selVar($("cat").value,"")};
  if(p.id)$("canc").onclick=function(){form(null)};
@@ -60,7 +63,7 @@ function form(p){
   if(!$("cat").value){$("er").textContent="Escolha a categoria.";return}
   if(!tamsMarcados()){$("er").textContent="Marque pelo menos um tamanho.";return}
   $("salvar").disabled=true;$("salvar").textContent="Salvando...";
-  var d={nome:$("nome").value.trim(),preco:preco,categoria:$("cat").value,variedade:($("vari")&&$("vari").value)||null,tamanhos:tamsMarcados(),descricao:$("desc").value.trim(),ativo:$("ativo").checked,foto_url:p.foto_url||null};
+  var d={nome:$("nome").value.trim(),preco:preco,categoria:$("cat").value,variedade:($("vari")&&$("vari").value)||null,tamanhos:tamsMarcados(),descricao:$("desc").value.trim(),ativo:$("ativo").checked,foto_url:tirou?null:(p.foto_url||null)};
   var f=$("foto").files[0];
   if(f){var n=Date.now()+"-"+f.name.replace(/[^a-zA-Z0-9.]/g,"_");var u=await db.storage.from("fotos").upload(n,f);
    if(u.error){$("er").textContent="Erro ao enviar a foto.";$("salvar").disabled=false;$("salvar").textContent="Salvar";return}
