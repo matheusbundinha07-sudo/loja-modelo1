@@ -15,13 +15,22 @@ label{display:block;margin:0 0 6px;color:var(--mut);font-size:.8rem;font-weight:
 .pri{background:#111;color:#fff;border:1px solid #111;border-radius:8px;padding:10px 16px;font-weight:600}
 .sec{background:#fff;color:#111;border:1px solid #d6d6d1;border-radius:8px;padding:10px 16px}
 button:disabled{opacity:.6}
-.top{height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:#fff;border-bottom:1px solid var(--line)}
-.top span{display:flex;gap:14px;align-items:center}.top button{border:0;background:none;padding:0;text-decoration:underline}
-.app{display:grid;grid-template-columns:300px 400px 1fr;height:calc(100vh - 52px)}
+.shell{display:grid;grid-template-columns:224px 1fr;height:100vh}
+.side{display:flex;flex-direction:column;gap:4px;padding:14px 12px;background:#fff;border-right:1px solid var(--line);overflow:auto}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 8px 16px;font-weight:700}
+.brand img{width:30px;height:30px;border-radius:50%;object-fit:cover;background:var(--pap)}
+.brand span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.side .nv{display:flex;align-items:center;gap:12px;width:100%;padding:11px 12px;border:0;border-radius:8px;background:none;color:var(--mut);text-align:left;font-weight:500;text-decoration:none;position:relative}
+.side .nv svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.side .nv:hover{background:#f6f6f3;color:var(--ink)}
+.side .nv.on{background:#f0f0ec;color:var(--ink);font-weight:600}
+.side .nv.on:before{content:"";position:absolute;left:-12px;top:8px;bottom:8px;width:3px;border-radius:0 3px 3px 0;background:var(--ink)}
+.side .nv em{margin-left:auto;font-style:normal;font-size:.72rem;background:var(--pap);color:var(--ink);border-radius:10px;padding:1px 8px}
+.side .gap{flex:1}
+.main{overflow:auto;min-width:0}
+.app{display:grid;grid-template-columns:300px 400px 1fr;height:100%}
 .col{overflow:auto;background:#fff;border-right:1px solid var(--line)}
-.tabs{display:flex;position:sticky;top:0;z-index:2;background:#fff;border-bottom:1px solid var(--line)}
-.tabs button{flex:1;padding:14px 8px;border:0;border-bottom:2px solid transparent;background:none;color:var(--mut)}
-.tabs .on{color:var(--ink);border-color:var(--ink);font-weight:600}
+.lh h2{margin:0;font-size:1rem}
 .lh{display:flex;flex-direction:column;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line)}
 .dica{padding:14px;color:var(--mut);margin:0}
 .it{display:flex;gap:10px;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line);cursor:pointer}
@@ -56,9 +65,36 @@ button:disabled{opacity:.6}
 .zapb{background:#111;color:#fff;text-align:center;padding:12px;border-radius:8px;font-weight:600;font-size:.9rem}
 .pg{display:grid;grid-template-columns:1fr 1fr;gap:10px}.pc{display:flex;flex-direction:column;gap:2px;font-size:.8rem}
 .pc img,.pc .ph{width:100%;aspect-ratio:4/5;object-fit:cover;background-color:var(--pap)}.pc span{color:var(--mut)}
+.vend{padding:28px 32px 40px;max-width:1000px}
+.vend h1{margin:0 0 4px;font-size:1.5rem}.vend .sub{margin:0 0 20px;color:var(--mut)}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.kpi{background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px}
+.kpi small{color:var(--mut);font-weight:600;font-size:.78rem}.kpi b{display:block;font-size:1.5rem;margin-top:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.box{background:#fff;border:1px solid var(--line);border-radius:10px;margin-bottom:18px;overflow:hidden}
+.box h2{margin:0;padding:14px 18px;font-size:1rem;border-bottom:1px solid var(--line)}
+.box h2 small{color:var(--mut);font-weight:400;margin-left:6px}
+.rk{display:grid;grid-template-columns:22px 40px minmax(0,1fr);gap:12px;align-items:center;padding:10px 18px}
+.rk+.rk{border-top:1px solid var(--line)}
+.rk .n{color:var(--mut);font-weight:700;text-align:center}
+.rk .l{display:flex;justify-content:space-between;gap:12px;margin-bottom:6px}.rk .l b{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rk .l span{font-weight:700;white-space:nowrap}
+.bar{height:10px;background:var(--pap);border-radius:5px;overflow:hidden}.bar i{display:block;height:100%;background:#111;border-radius:5px}
+.rk:first-of-type .bar i{background:#e0a800}
+.vazio3{padding:28px 18px;color:var(--mut);margin:0}
+.vr{display:flex;align-items:center;gap:12px;padding:10px 18px;border-top:1px solid var(--line)}
+.vr:first-of-type{border-top:0}
+.vr .inf{flex:1}
+.step{display:flex;gap:4px;align-items:center}
+.step button{width:34px;height:34px;border:1px solid #d6d6d1;border-radius:8px;background:#fff;font-size:1.1rem;line-height:1}
+.step input{width:60px;text-align:center;padding:7px 4px}
+.vr .star{font-size:1.5rem}
+.vr .lb{font-size:.7rem;color:var(--mut);text-align:center;width:48px;line-height:1.1}
+.warn{background:#fff8e1;border:1px solid #f0d98a;border-radius:10px;padding:14px 16px;margin-bottom:18px;font-size:.88rem}
+.warn code{display:block;margin:8px 0;padding:8px 10px;background:#fff;border:1px solid #ecdca0;border-radius:6px;overflow:auto;white-space:nowrap}
 .login{max-width:360px;margin:12vh auto;padding:24px;background:#fff;border:1px solid var(--line);border-radius:12px}
 .login h1{font-size:1.3rem;margin:0 0 14px}.login label{margin-top:12px}.login .pri{width:100%;margin-top:16px}
+@media(max-width:1100px){.shell{grid-template-columns:64px 1fr}.brand span,.side .nv span,.side .nv em{display:none}.side .nv{justify-content:center;padding:12px 0}.brand{justify-content:center;padding-left:0;padding-right:0}.side .nv.on:before{left:-12px}}
 @media(max-width:1000px){.app{display:block;height:auto}.col{overflow:visible;border-right:0}.app.edit .lista{display:none}.app:not(.edit) .editor,.app:not(.edit) .prevcol{display:none}.prevcol{padding:16px}}
+@media(max-width:760px){.shell{display:block;height:auto}.side{position:fixed;left:0;right:0;bottom:0;top:auto;z-index:5;flex-direction:row;justify-content:space-around;padding:4px 8px;border-right:0;border-top:1px solid var(--line)}.brand,.side .gap{display:none}.side .nv{flex-direction:column;gap:2px;padding:6px 4px;font-size:.68rem}.side .nv span{display:block}.side .nv em{display:none}.side .nv.on:before{display:none}.main{overflow:visible;padding-bottom:64px}.vend{padding:20px 16px 40px}.cards{grid-template-columns:1fr}.vr{flex-wrap:wrap}.vr .inf{flex:1 1 60%}}
 </style></head>
 <body><div id="root"></div>
 <script>
@@ -80,27 +116,31 @@ function login(msg){
  $("go").onclick=async()=>{const r=await db.auth.signInWithPassword({email:$("em").value.trim(),password:$("se").value});if(r.error)root.querySelector(".err").textContent="E-mail ou senha incorretos.";else carregar()};
 }
 async function carregar(){const r=await db.from("produtos").select("*").order("criado",{ascending:false});if(r.error){login("Sessão expirada. Entre de novo.");return}itens=r.data;base()}
+const IC={
+ prod:'<svg viewBox="0 0 24 24"><path d="M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z"/><circle cx="7.5" cy="7.5" r="1.2"/></svg>',
+ vend:'<svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>',
+ loja:'<svg viewBox="0 0 24 24"><path d="M4 9l1.5-5h13L20 9M4 9v11h16V9M4 9h16M9 20v-6h6v6"/></svg>',
+ sair:'<svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>'};
+function nav(a,ic,txt,n){return `<button class="nv${aba===a?" on":""}" data-a="${a}" title="${txt}"${aba===a?' aria-current="page"':""}>${IC[ic]}<span>${txt}</span>${n!=null?`<em>${n}</em>`:""}</button>`}
 function base(){
- root.innerHTML=`<div class="top"><b>${esc(LOJA)} · Painel</b><span><a href="/" target="_blank">Ver loja</a><button id="sair">Sair</button></span></div><div class="app${sel!==null&&aba==="produtos"?" edit":""}" id="app"><div class="col lista" id="lista"></div><div class="col editor" id="editor"></div><div class="prevcol" id="prevcol"></div></div>`;
+ const nv=itens.filter(p=>p.mais_vendido).length;
+ const corpo=aba==="produtos"?`<div class="app${sel!==null?" edit":""}" id="app"><div class="col lista" id="lista"></div><div class="col editor" id="editor"></div><div class="prevcol" id="prevcol"></div></div>`:`<div class="vend" id="vend"></div>`;
+ root.innerHTML=`<div class="shell"><aside class="side" aria-label="Menu"><div class="brand"><img src="logo.png" alt=""><span>${esc(LOJA)}</span></div>${nav("produtos","prod","Produtos",itens.length)}${nav("vendidos","vend","Mais vendidos",nv)}<div class="gap"></div><a class="nv" href="/" target="_blank" title="Ver loja">${IC.loja}<span>Ver loja</span></a><button class="nv" id="sair" title="Sair">${IC.sair}<span>Sair</span></button></aside><main class="main" id="main">${corpo}</main></div>`;
  $("sair").onclick=async()=>{await db.auth.signOut();sel=null;login()};
- lista();editor();prev();
+ root.querySelectorAll(".side [data-a]").forEach(b=>b.onclick=()=>{if(aba===b.dataset.a)return;aba=b.dataset.a;sel=null;base()});
+ if(aba==="produtos"){lista();editor();prev()}else vendidos();
 }
 function lista(){
- const nv=itens.filter(p=>p.mais_vendido).length;
- $("lista").innerHTML=`<div class="tabs"><button data-a="produtos" class="${aba==="produtos"?"on":""}">Produtos (${itens.length})</button><button data-a="vendidos" class="${aba==="vendidos"?"on":""}">Mais vendidos (${nv})</button></div>`+(aba==="produtos"?`<div class="lh"><input id="busca" placeholder="Buscar produto" value="${esc(busca)}"><button class="pri" id="novo">+ Novo produto</button></div>`:`<p class="dica">Toque na estrela para marcar os produtos mais vendidos. Eles aparecem na aba “Mais vendidos” do site.</p>`)+`<div id="rows"></div>`;
- $("lista").querySelectorAll("[data-a]").forEach(b=>b.onclick=()=>{aba=b.dataset.a;sel=null;base()});
- if($("busca"))$("busca").oninput=e=>{busca=e.target.value;rows()};
- if($("novo"))$("novo").onclick=()=>abrir("novo");
+ $("lista").innerHTML=`<div class="lh"><h2>Produtos (${itens.length})</h2><input id="busca" placeholder="Buscar produto" value="${esc(busca)}"><button class="pri" id="novo">+ Novo produto</button></div><div id="rows"></div>`;
+ $("busca").oninput=e=>{busca=e.target.value;rows()};
+ $("novo").onclick=()=>abrir("novo");
  rows();
 }
 function thumb(p){return p.foto_url?`<img src="${esc(p.foto_url)}" alt="">`:`<div class="th"></div>`}
 function rows(){
- let l=itens.slice();
- if(aba==="produtos"){const q=busca.toLowerCase();l=l.filter(p=>p.nome.toLowerCase().includes(q))}
- else l.sort((a,b)=>(b.mais_vendido?1:0)-(a.mais_vendido?1:0));
- $("rows").innerHTML=l.map(p=>`<div class="it${p.id===sel?" on":""}" data-id="${p.id}">${thumb(p)}<div class="inf"><b>${esc(p.nome)}</b><span>${brl(Number(p.preco))}${p.categoria?" · "+esc(p.categoria):""}${p.ativo?"":" · oculto"}</span></div>${aba==="vendidos"?`<button class="star${p.mais_vendido?" on":""}" data-s="${p.id}" aria-label="Marcar como mais vendido">★</button>`:(p.mais_vendido?`<span class="tag">★</span>`:"")}</div>`).join("")||`<p class="dica">Nenhum produto.</p>`;
- if(aba==="produtos")$("rows").querySelectorAll(".it").forEach(r=>r.onclick=()=>abrir(r.dataset.id));
- else $("rows").querySelectorAll("[data-s]").forEach(b=>b.onclick=async()=>{const p=itens.find(x=>x.id===b.dataset.s),v=!p.mais_vendido;const r=await db.from("produtos").update({mais_vendido:v}).eq("id",p.id);if(r.error){alert("Erro ao salvar.");return}p.mais_vendido=v;lista();prev()});
+ const q=busca.toLowerCase(),l=itens.filter(p=>p.nome.toLowerCase().includes(q));
+ $("rows").innerHTML=l.map(p=>`<div class="it${p.id===sel?" on":""}" data-id="${p.id}">${thumb(p)}<div class="inf"><b>${esc(p.nome)}</b><span>${brl(Number(p.preco))}${p.categoria?" · "+esc(p.categoria):""}${p.ativo?"":" · oculto"}</span></div>${p.mais_vendido?`<span class="tag" title="Mais vendido">★</span>`:""}</div>`).join("")||`<p class="dica">Nenhum produto.</p>`;
+ $("rows").querySelectorAll(".it").forEach(r=>r.onclick=()=>abrir(r.dataset.id));
 }
 function abrir(id){
  sel=id;if(urlNova){URL.revokeObjectURL(urlNova);urlNova=null}
@@ -118,7 +158,7 @@ function fotoUI(){
 }
 function editor(){
  const ed=$("editor");
- if(sel===null){ed.innerHTML=`<div class="vazio2"><p>${aba==="produtos"?"Escolha um produto na lista ou clique em “+ Novo produto”.":"Marque os mais vendidos na lista ao lado."}</p></div>`;return}
+ if(sel===null){ed.innerHTML=`<div class="vazio2"><p>Escolha um produto na lista ou clique em “+ Novo produto”.</p></div>`;return}
  const novo=sel==="novo";
  ed.innerHTML=`<div class="edhead"><b>${novo?"Novo produto":"Editar produto"}</b><button class="x" id="fechar" aria-label="Fechar">×</button></div>
 <div class="fld"><label>Foto</label><div class="fotobox" id="fotobox"></div><input id="foto" type="file" accept="image/*"></div>
@@ -141,13 +181,38 @@ function editor(){
   prev()};
  $("salvar").onclick=salvar;if($("excluir"))$("excluir").onclick=excluir;
 }
-function card(p){return `<div class="pc">${p.foto_url?`<img src="${esc(p.foto_url)}" alt="">`:`<div class="ph"></div>`}<b>${esc(p.nome)}</b><span>${brl(Number(p.preco))}</span></div>`}
 function prev(){
  const c=$("prevcol"),topo=`<div class="tel-top"><img src="logo.png" alt=""><b>${esc(LOJA)}</b></div>`;
- if(aba==="vendidos"){const l=itens.filter(p=>p.mais_vendido&&p.ativo);c.innerHTML=`<div class="tel">${topo}<div class="pad"><p class="rot">Aba “Mais vendidos” no site</p><div class="pg">${l.map(card).join("")||"<p class='rot'>Nenhum marcado ainda.</p>"}</div></div></div>`;return}
  if(sel===null){c.innerHTML=`<p class="rot">A prévia do produto aparece aqui.</p>`;return}
  const f=d.file?urlNova:(!d.tirou&&d.foto_url);
  c.innerHTML=`<div class="tel">${topo}${f?`<img class="big" src="${esc(f)}" alt="">`:`<div class="ph big"></div>`}<div class="pad"><p class="rot">Prévia no celular</p><h3>${esc(d.nome)||"Nome do produto"}</h3><div class="pr">${brl(num(d.preco))}</div><p class="ds">${esc(d.descricao)}</p><div class="sz">${d.tamanhos.map(t=>`<span>${esc(t)}</span>`).join("")}</div><div class="zapb">Pedir pelo WhatsApp</div></div></div>`;
+}
+const SQL_VENDAS="alter table produtos add column if not exists vendas integer not null default 0;";
+const V=p=>Number(p.vendas)||0;
+function vendidos(){
+ const tem=!itens.length||"vendas" in itens[0];
+ const rank=itens.slice().sort((a,b)=>V(b)-V(a)||a.nome.localeCompare(b.nome,"pt"));
+ const com=rank.filter(p=>V(p)>0),top=com.slice(0,8),max=top.length?V(top[0]):1;
+ const total=itens.reduce((s,p)=>s+V(p),0),rec=itens.reduce((s,p)=>s+V(p)*(Number(p.preco)||0),0);
+ const grafico=top.length?`<div role="list">${top.map((p,i)=>`<div class="rk" role="listitem"><span class="n">${i+1}º</span>${thumb(p)}<div><div class="l"><b>${esc(p.nome)}</b><span>${V(p)} ${V(p)===1?"venda":"vendas"}</span></div><div class="bar"><i style="width:${Math.max(3,V(p)/max*100)}%"></i></div></div></div>`).join("")}</div>`:`<p class="vazio3">Nenhuma venda registrada ainda. Use o <b>+</b> na lista abaixo toda vez que vender um produto e o gráfico aparece aqui.</p>`;
+ $("vend").innerHTML=`<h1>Mais vendidos</h1><p class="sub">Veja quais produtos estão saindo mais e registre as vendas.</p>
+${tem?"":`<div class="warn"><b>Falta um passo no Supabase para contar as vendas.</b> Abra o SQL Editor, cole o comando abaixo e clique em Run. Depois atualize esta página.<code>${SQL_VENDAS}</code><button class="sec" id="cp">Copiar comando</button></div>`}
+<div class="cards"><div class="kpi"><small>Total de vendas</small><b>${total}</b></div><div class="kpi"><small>Receita estimada</small><b>${brl(rec)}</b></div><div class="kpi"><small>Produto líder</small><b>${com.length?esc(com[0].nome):"—"}</b></div></div>
+<div class="box"><h2>Ranking de vendas<small>top 8</small></h2>${grafico}</div>
+<div class="box"><h2>Registrar vendas<small>★ = aparece na aba “Mais vendidos” do site</small></h2>${rank.map(p=>`<div class="vr" data-id="${p.id}">${thumb(p)}<div class="inf"><b>${esc(p.nome)}</b><span>${brl(Number(p.preco))}${p.categoria?" · "+esc(p.categoria):""}</span></div><div class="step"><button data-m="-1" aria-label="Menos uma venda"${tem?"":" disabled"}>−</button><input type="number" min="0" inputmode="numeric" value="${V(p)}" aria-label="Vendas de ${esc(p.nome)}"${tem?"":" disabled"}><button data-m="1" aria-label="Mais uma venda"${tem?"":" disabled"}>+</button></div><div><button class="star${p.mais_vendido?" on":""}" data-s="1" aria-label="Mostrar no site como mais vendido" aria-pressed="${!!p.mais_vendido}">★</button></div></div>`).join("")||`<p class="vazio3">Nenhum produto cadastrado.</p>`}</div>`;
+ if($("cp"))$("cp").onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(SQL_VENDAS);$("cp").textContent="Copiado!"};
+ $("vend").querySelectorAll(".vr").forEach(r=>{
+  const p=itens.find(x=>x.id===r.dataset.id);
+  r.querySelectorAll("[data-m]").forEach(b=>b.onclick=()=>setVendas(p,V(p)+Number(b.dataset.m)));
+  const i=r.querySelector("input");i.onchange=()=>setVendas(p,Number(i.value));
+  r.querySelector("[data-s]").onclick=async()=>{const v=!p.mais_vendido;const x=await db.from("produtos").update({mais_vendido:v}).eq("id",p.id);if(x.error){alert("Erro ao salvar.");return}p.mais_vendido=v;base()};
+ });
+}
+async function setVendas(p,n){
+ n=Math.max(0,Math.floor(n)||0);
+ const r=await db.from("produtos").update({vendas:n}).eq("id",p.id);
+ if(r.error){alert("Erro ao salvar as vendas. Confira se o passo do Supabase foi feito.");return}
+ p.vendas=n;vendidos();
 }
 async function salvar(){
  const msg=$("msg"),preco=num(d.preco);
