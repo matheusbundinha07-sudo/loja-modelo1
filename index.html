@@ -26,6 +26,12 @@ button.zap{border:0;font:inherit;cursor:pointer}
 .cx-f.on{display:block}
 .cx-t{display:flex;justify-content:space-between;font-size:1.1rem;font-weight:700;margin-bottom:12px}
 .cx-c{display:block;background:#111;color:#fff;text-align:center;text-decoration:none;padding:14px;border-radius:8px;font-weight:700}
+button.cx-c{width:100%;border:0;font:inherit;font-weight:700;cursor:pointer}
+.cx-fm{margin-bottom:12px}.cx-fm label{display:block;font-size:.8rem;font-weight:600;color:#555;margin:0 0 4px}
+.cx-fm input{width:100%;padding:11px 12px;border:1px solid #d6d6d1;border-radius:8px;font:inherit;margin-bottom:10px;box-sizing:border-box}
+.cx-fm input:focus-visible{outline:2px solid #111;outline-offset:1px}
+.cx-fm input.bad{border-color:#b3261e}
+.cx-e{color:#b3261e;font-size:.85rem;margin:-4px 0 10px;min-height:0}
 .cx-k{display:block;width:100%;margin-top:8px;padding:10px;border:0;background:none;color:#555;cursor:pointer;font:inherit;text-decoration:underline}
 </style>
 </head>
@@ -34,7 +40,7 @@ button.zap{border:0;font:inherit;cursor:pointer}
 <header class="topo"><a class="marca" href="#"><img src="logo.png" alt=""><span id="logo"></span></a>
 <nav><a href="#">Catálogo</a><a id="contato" target="_blank" rel="noopener">Contato</a><button class="cx-btn" id="cxbtn" type="button" aria-label="Abrir carrinho">Carrinho<i id="cxn">0</i></button></nav></header>
 <main class="wrap" id="app">Carregando...</main>
-<div class="cx" id="cx"><div class="cx-ov" data-x></div><aside class="cx-p" role="dialog" aria-label="Carrinho"><div class="cx-h"><b>Carrinho</b><button type="button" data-x aria-label="Fechar">×</button></div><div class="cx-b" id="cxb"></div><div class="cx-f" id="cxf"><div class="cx-t"><span>Total</span><span id="cxt"></span></div><a class="cx-c" id="cxc" target="_blank" rel="noopener">Comprar</a><button class="cx-k" type="button" data-x>Continuar comprando</button></div></aside></div>
+<div class="cx" id="cx"><div class="cx-ov" data-x></div><aside class="cx-p" role="dialog" aria-label="Carrinho"><div class="cx-h"><b>Carrinho</b><button type="button" data-x aria-label="Fechar">×</button></div><div class="cx-b" id="cxb"></div><div class="cx-f" id="cxf"><div class="cx-t"><span>Total</span><span id="cxt"></span></div><div class="cx-fm"><label for="cxnome">Nome *</label><input id="cxnome" autocomplete="name" placeholder="Seu nome"><label for="cxtel">Telefone (opcional)</label><input id="cxtel" type="tel" inputmode="tel" autocomplete="tel" placeholder="(32) 99999-9999"><p class="cx-e" id="cxe" role="alert"></p></div><button class="cx-c" id="cxc" type="button">Comprar</button><button class="cx-k" type="button" data-x>Continuar comprando</button></div></aside></div>
 <footer><span id="rod"></span><span>Pirapetinga-MG</span><a href="https://instagram.com/quebrada_beckas" target="_blank" rel="noopener">Instagram</a></footer>
 <script>
 document.getElementById("logo").textContent=LOJA;document.title=LOJA+" | Catálogo";document.getElementById("rod").textContent="© "+LOJA;
@@ -65,6 +71,7 @@ function lista(){
 }
 document.addEventListener("click",function(e){if(aberto&&!e.target.closest(".drop")){aberto=null;if(document.querySelector(".abas"))lista()}});
 
+var PEDIDO={linhas:[],total:0};
 var CART=[];try{CART=JSON.parse(localStorage.getItem("cart")||"[]")}catch(e){}
 function salvaCart(){try{localStorage.setItem("cart",JSON.stringify(CART))}catch(e){}}
 function cartQtd(){return CART.reduce(function(s,i){return s+i.q},0)}
@@ -82,7 +89,7 @@ function cartUI(abrir){
  b.innerHTML=CART.map(function(i,k){total+=i.p*i.q;linhas.push("• "+i.q+"x "+i.n+" (tam. "+i.t+") - "+brl(i.p*i.q));
   return '<div class="cx-i">'+(i.f?'<img src="'+esc(i.f)+'" alt="">':'<div class="cx-f0"></div>')+'<div class="cx-d"><b>'+esc(i.n)+'</b><small>Tamanho '+esc(i.t)+'</small><div class="cx-q"><button type="button" data-k="'+k+'" data-d="-1" aria-label="Diminuir">−</button><span>'+i.q+'</span><button type="button" data-k="'+k+'" data-d="1" aria-label="Aumentar">+</button><button type="button" class="cx-r" data-k="'+k+'" data-d="0">Remover</button></div></div><span class="cx-pr">'+brl(i.p*i.q)+'</span></div>'}).join("");
  document.getElementById("cxt").textContent=brl(total);
- document.getElementById("cxc").href="https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent("Olá! Quero comprar:\n"+linhas.join("\n")+"\n\nTotal: "+brl(total));
+ PEDIDO={linhas:linhas,total:total};
  f.classList.add("on");
 }
 document.getElementById("cxbtn").onclick=function(){cartUI(true)};
@@ -94,6 +101,22 @@ document.getElementById("cx").addEventListener("click",function(e){
  salvaCart();cartUI();
 });
 document.addEventListener("keydown",function(e){if(e.key==="Escape")document.getElementById("cx").classList.remove("on")});
+(function(){
+ var n=document.getElementById("cxnome"),t=document.getElementById("cxtel"),e=document.getElementById("cxe");
+ try{n.value=localStorage.getItem("cliente_nome")||"";t.value=localStorage.getItem("cliente_tel")||""}catch(x){}
+ function erro(m,c){e.textContent=m;n.classList.remove("bad");t.classList.remove("bad");if(c){c.classList.add("bad");c.focus()}}
+ n.oninput=t.oninput=function(){erro("")};
+ document.getElementById("cxc").onclick=function(){
+  var nome=n.value.trim(),tel=t.value.trim();
+  if(!nome){erro("Digite seu nome para continuar.",n);return}
+  if(tel&&tel.replace(/\D/g,"").length<10){erro("Telefone incompleto. Coloque o DDD ou deixe em branco.",t);return}
+  erro("");
+  try{localStorage.setItem("cliente_nome",nome);localStorage.setItem("cliente_tel",tel)}catch(x){}
+  var msg="Nome: "+nome+"\nTelefone: "+(tel||"não informado")+"\n\nPedido:\n"+PEDIDO.linhas.join("\n")+"\n\nTotal: "+brl(PEDIDO.total);
+  var url="https://wa.me/"+WHATSAPP+"?text="+encodeURIComponent(msg);
+  if(!window.open(url,"_blank"))location.href=url;
+ };
+})();
 cartUI();
 function prod(p){
  var T=tams(p);if(!tam||T.indexOf(tam)<0)tam=T[0];
