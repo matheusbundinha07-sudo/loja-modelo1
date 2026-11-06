@@ -9,6 +9,9 @@ select{width:100%;font:inherit;padding:10px;border:1px solid #c9c9c5;border-radi
 .chips span{display:inline-flex;align-items:center;justify-content:center;min-width:48px;height:44px;padding:0 12px;border:1px solid var(--texto)}
 .chips input:checked+span{background:var(--texto);color:#fff}
 .chips input:focus-visible+span{outline:2px solid var(--texto);outline-offset:2px}
+.prev{display:flex;align-items:flex-end;gap:10px;margin-top:10px}
+.prev img{width:120px;aspect-ratio:4/5;object-fit:cover;background:var(--papel)}
+.prev span{font-size:.85rem;color:var(--suave)}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="config.js"></script></head>
@@ -42,7 +45,13 @@ async function painel(){
 }
 function form(p){
  p=p||{};
- $("form").innerHTML='<h2>'+(p.id?"Editar produto":"Novo produto")+'</h2><label>Nome</label><input id="nome" value="'+esc(p.nome)+'"><label>Preço (ex: 129,90)</label><input id="preco" value="'+(p.preco!=null?String(p.preco).replace(".",","):"")+'"><label>Categoria</label>'+selCat(p.categoria)+'<div id="varbox">'+selVar(p.categoria,p.variedade)+'</div><label>Tamanhos (marque os que tem)</label>'+chipsTam(p.tamanhos)+'<label>Descrição</label><textarea id="desc" rows="3">'+esc(p.descricao)+'</textarea><label>Foto'+(p.foto_url?' (já tem uma; escolha outra para trocar)':'')+'</label><input id="foto" type="file" accept="image/*"><div class="chk"><input id="ativo" type="checkbox" '+(p.id&&!p.ativo?'':'checked')+'><span>Mostrar no catálogo</span></div><p><button class="principal" id="salvar">Salvar</button> '+(p.id?'<button id="canc">Cancelar</button>':'')+'</p><p class="erro" id="er"></p>';
+ $("form").innerHTML='<h2>'+(p.id?"Editar produto":"Novo produto")+'</h2><label>Nome</label><input id="nome" value="'+esc(p.nome)+'"><label>Preço (ex: 129,90)</label><input id="preco" value="'+(p.preco!=null?String(p.preco).replace(".",","):"")+'"><label>Categoria</label>'+selCat(p.categoria)+'<div id="varbox">'+selVar(p.categoria,p.variedade)+'</div><label>Tamanhos (marque os que tem)</label>'+chipsTam(p.tamanhos)+'<label>Descrição</label><textarea id="desc" rows="3">'+esc(p.descricao)+'</textarea><label>Foto'+(p.foto_url?' (já tem uma; escolha outra para trocar)':'')+'</label><input id="foto" type="file" accept="image/*"><div id="prev" class="prev"></div><div class="chk"><input id="ativo" type="checkbox" '+(p.id&&!p.ativo?'':'checked')+'><span>Mostrar no catálogo</span></div><p><button class="principal" id="salvar">Salvar</button> '+(p.id?'<button id="canc">Cancelar</button>':'')+'</p><p class="erro" id="er"></p>';
+ var urlNova=null;
+ function prev(){var d=$("prev"),f=$("foto").files[0];if(urlNova){URL.revokeObjectURL(urlNova);urlNova=null}
+  if(f){urlNova=URL.createObjectURL(f);d.innerHTML='<img src="'+urlNova+'" alt=""><span>Nova foto (ainda não salva)</span>'}
+  else if(p.foto_url){d.innerHTML='<img src="'+esc(p.foto_url)+'" alt=""><span>Foto atual</span>'}
+  else d.innerHTML=""}
+ $("foto").onchange=prev;prev();
  $("cat").onchange=function(){$("varbox").innerHTML=selVar($("cat").value,"")};
  if(p.id)$("canc").onclick=function(){form(null)};
  $("salvar").onclick=async function(){
