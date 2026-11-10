@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex"><title>Painel</title>
+<meta name="robots" content="noindex"><meta name="theme-color" content="#ffffff"><title>Painel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Big+Shoulders+Display:wght@700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="config.js"></script>
 <style>
-:root{--bg:#f3f3f0;--ink:#111;--mut:#7b7b76;--line:#e4e4e0;--pap:#f2f2ef}
+:root{--bg:#f5f5f3;--ink:#111;--mut:#777772;--line:#e6e6e3;--pap:#efefec;--sinal:#ffd400;--disp:"Big Shoulders Display","Arial Narrow",Impact,sans-serif}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
 button{font:inherit;cursor:pointer}
@@ -166,6 +168,97 @@ button:disabled{opacity:.6}
 .lbusca{padding:12px 18px}
 @media(max-width:900px){.loja{grid-template-columns:1fr}}
 @media(max-width:760px){.side .nv{flex:1 0 64px}.cards.c5{grid-template-columns:1fr 1fr}}
+
+/* ===== tema rua / clean + animações ===== */
+@keyframes subir{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes crescer{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes barra{from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes pop{0%{transform:scale(.7);opacity:0}60%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+@keyframes pulsa{0%{box-shadow:0 0 0 0 rgba(224,168,0,.6)}100%{box-shadow:0 0 0 7px rgba(224,168,0,0)}}
+*{scrollbar-width:thin;scrollbar-color:#c9c9c5 transparent}
+body{font-family:"Archivo",system-ui,-apple-system,"Segoe UI",sans-serif}
+button{transition:background .15s,color .15s,border-color .15s,transform .12s,box-shadow .2s}
+button:active:not(:disabled){transform:scale(.97)}
+input,select,textarea{border-radius:4px;border-color:#d9d9d5;transition:border-color .15s,box-shadow .15s}
+input:focus-visible,select:focus-visible,textarea:focus-visible{outline:0;border-color:var(--ink);box-shadow:0 0 0 3px var(--sinal)}
+.pri,.sec{border-radius:4px}
+.pri:hover:not(:disabled){background:var(--sinal);border-color:var(--sinal);color:var(--ink)}
+.sec:hover:not(:disabled){border-color:var(--ink)}
+
+/* entrada da tela ao trocar de aba */
+.main>*{animation:subir .35s ease-out both}
+.login{border-radius:6px;border-top:4px solid var(--sinal);animation:subir .45s ease-out both}
+.login h1,.vend h1{font:800 clamp(1.9rem,3.6vw,2.7rem)/.95 var(--disp);text-transform:uppercase;letter-spacing:-.005em}
+.vend h1{margin:0 0 6px}
+
+/* menu lateral */
+.side{background:#fff}
+.brand{font:800 1.7rem/1 var(--disp);text-transform:uppercase;letter-spacing:.02em}
+.brand:before{content:"";width:12px;height:12px;flex:none;background:var(--sinal);transition:transform .4s}
+.brand:hover:before{transform:rotate(90deg)}
+.side .nv{border-radius:4px;transition:background .15s,color .15s}
+.side .nv svg{transition:transform .2s}
+.side .nv:hover svg{transform:scale(1.14)}
+.side .nv.on{background:var(--ink);color:#fff}
+.side .nv.on svg{stroke:var(--sinal)}
+.side .nv.on:before{background:var(--sinal);animation:barra .25s ease-out}
+.side .nv em{background:var(--sinal);color:var(--ink);font-weight:700;animation:pop .35s ease-out}
+
+/* títulos */
+.box,.kpi{border-radius:6px}
+.box h2,.lh h2{font:700 1.2rem/1.1 var(--disp);text-transform:uppercase;letter-spacing:.03em}
+.box h2 small{font-family:"Archivo",system-ui,sans-serif;text-transform:none;letter-spacing:0}
+
+/* cartões de números */
+.kpi{position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s}
+.kpi:before{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:var(--sinal);transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.kpi:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(0,0,0,.07)}
+.kpi:hover:before{transform:scaleX(1)}
+.kpi b{font:800 2rem/1.05 var(--disp);letter-spacing:.01em}
+
+/* listas */
+.it,.vr,.pd,.lp{transition:background .15s}
+.it{position:relative}
+.it:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--sinal);transform:scaleY(0);transition:transform .2s}
+.it:hover:before,.it.on:before{transform:scaleY(1)}
+.it:hover,.vr:hover,.pd:hover,.lp:hover{background:#fafaf8}
+.it.on{background:#fff8d1}
+.it img,.th{border-radius:3px}
+
+/* barras que crescem */
+.bar,.bar i{border-radius:3px}
+.bar i{transform-origin:left;animation:crescer .8s cubic-bezier(.2,.8,.2,1) both}
+.rk:nth-child(3) .bar i,.mrow:nth-child(2) .bar i{animation-delay:0.07s}
+.rk:nth-child(4) .bar i,.mrow:nth-child(3) .bar i{animation-delay:0.14s}
+.rk:nth-child(5) .bar i,.mrow:nth-child(4) .bar i{animation-delay:0.21s}
+.rk:nth-child(6) .bar i,.mrow:nth-child(5) .bar i{animation-delay:0.28s}
+.rk:nth-child(7) .bar i,.mrow:nth-child(6) .bar i{animation-delay:0.35s}
+.rk:nth-child(8) .bar i,.mrow:nth-child(7) .bar i{animation-delay:0.42s}
+.rk:nth-child(9) .bar i,.mrow:nth-child(8) .bar i{animation-delay:0.49s}
+svg[aria-label] rect{transform-box:fill-box;transform-origin:50% 100%;animation:barra .7s cubic-bezier(.2,.8,.2,1) both}
+
+/* etiquetas e botões de ação */
+.pill.p:before{content:"";display:inline-block;width:7px;height:7px;margin-right:6px;border-radius:50%;background:#e0a800;animation:pulsa 1.6s infinite}
+.msg:not(:empty){display:inline-block;animation:pop .3s ease-out}
+.bt-ok,.bt-no{border-radius:6px}
+.bt-ok:hover,.bt-no:hover{transform:scale(1.08)}
+.seg button:hover:not(.on){border-color:var(--ink);color:var(--ink)}
+.chips span{border-radius:4px;transition:background .15s,color .15s,border-color .15s,box-shadow .15s}
+.chips span:hover{border-color:var(--ink)}
+.chips input:checked+span{box-shadow:inset 0 -3px 0 var(--sinal)}
+.step button:hover,.ltam button:hover,.fi .fb button:not(:disabled):hover{border-color:var(--ink)}
+.ltam button.on{box-shadow:inset 0 -3px 0 var(--sinal)}
+.dy{transition:transform .15s,box-shadow .15s}
+.dy:hover{transform:scale(1.08);box-shadow:0 4px 12px rgba(0,0,0,.1)}
+.dy.sel{outline-color:var(--ink)}
+.kp button{border-radius:6px;transition:background .15s,transform .12s}
+.kp button:hover{background:#f3f3f0}
+.kp .e:hover{background:var(--sinal);border-color:var(--sinal);color:var(--ink)}
+.warn{border-radius:6px}
+.tel{transition:transform .3s,box-shadow .3s}
+.tel:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.12)}
+
+@media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 </style></head>
 <body><div id="root"></div>
 <script>
