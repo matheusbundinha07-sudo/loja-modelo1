@@ -60,6 +60,10 @@ button:disabled{opacity:.6}
 .chips span{display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:40px;padding:0 12px;border:1px solid #d6d6d1;border-radius:8px;background:#fff}
 .chips input:checked+span{background:var(--ink);color:#fff;border-color:var(--ink)}
 .chips input:focus-visible+span{outline:2px solid var(--ink);outline-offset:2px}
+.est{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:10px;margin-top:6px}
+.est-i{display:flex;flex-direction:column;gap:4px;margin:0;color:var(--ink)}
+.est-i span{font-weight:600;font-size:.9rem}
+.est-i input{width:100%;box-sizing:border-box}
 #varbox{margin-top:12px}
 .chk{display:flex;gap:8px;align-items:center;color:var(--ink);font-size:.9rem;font-weight:400;margin:8px 0}.chk input{width:auto}
 .barra{position:sticky;bottom:0;background:#fff;border-top:1px solid var(--line);padding:12px 18px;display:flex;gap:8px;align-items:center;margin-top:20px}
@@ -319,7 +323,7 @@ function lista(){
 function thumb(p){return p.foto_url?`<img class="th" src="${esc(p.foto_url)}" alt="">`:`<div class="th"></div>`}
 function rows(){
  const q=busca.toLowerCase(),l=itens.filter(p=>p.nome.toLowerCase().includes(q)&&(!catF||p.categoria===catF));
- $("rows").innerHTML=l.map(p=>`<div class="it${p.id===sel?" on":""}" data-id="${p.id}">${thumb(p)}<div class="inf"><b>${esc(p.nome)}</b><span>${brl(Number(p.preco))}${p.categoria?" · "+esc(p.categoria):""}${p.ativo?"":" · oculto"}${baixo(p)?` · <span class="low">estoque baixo</span>`:""}</span></div>${p.mais_vendido?`<span class="tag" title="Mais vendido">★</span>`:""}</div>`).join("")||`<p class="dica">Nenhum produto.</p>`;
+ $("rows").innerHTML=l.map(p=>`<div class="it${p.id===sel?" on":""}" data-id="${p.id}">${thumb(p)}<div class="inf"><b>${esc(p.nome)}</b><span>${brl(Number(p.preco))}${p.categoria?" · "+esc(p.categoria):""}${p.ativo?"":" · oculto"}${tot(p)!==null?" · "+tot(p)+" un.":""}${baixo(p)?` · <span class="low">estoque baixo</span>`:""}</span></div>${p.mais_vendido?`<span class="tag" title="Mais vendido">★</span>`:""}</div>`).join("")||`<p class="dica">Nenhum produto.</p>`;
  $("rows").querySelectorAll(".it").forEach(r=>r.onclick=()=>abrir(r.dataset.id));
 }
 function abrir(id){
@@ -577,12 +581,15 @@ async function excluir(){if(!confirm("Excluir este produto?"))return;const r=awa
 
 // ===== ESTOQUE, INÍCIO, CLIENTES, DESPESAS, EXPORTAÇÃO =====
 const stk=(p,t)=>p.estoque&&p.estoque[t]!=null&&p.estoque[t]!==""?Number(p.estoque[t]):null;
+const tot=p=>{const v=tams(p.tamanhos).map(t=>stk(p,t)).filter(x=>x!==null);return v.length?v.reduce((s,x)=>s+x,0):null};
 const baixo=p=>tams(p.tamanhos).some(t=>{const e=stk(p,t);return e!==null&&e<=LIM});
 async function baixa(its,dir){for(const i of its){const p=itens.find(x=>String(x.id)===String(i.id));if(!p)continue;const u={},q=Number(i.q)||0;
  if("vendas" in p)u.vendas=Math.max(0,V(p)+dir*q);
  if("estoque" in p&&stk(p,i.t)!==null){const e=Object.assign({},p.estoque);e[i.t]=Math.max(0,Number(e[i.t])-dir*q);u.estoque=e}
  if(!Object.keys(u).length)continue;const x=await db.from("produtos").update(u).eq("id",p.id);if(!x.error)Object.assign(p,u)}}
-function estUI(){const b=$("estbox");if(!b)return;b.innerHTML=d.tamanhos.length?`<label>Estoque por tamanho (vazio = não controlar)</label><div class="chips">${d.tamanhos.map(t=>`<label style="display:flex;align-items:center;gap:6px">${esc(t)}<input data-e="${esc(t)}" type="number" min="0" inputmode="numeric" value="${d.estoque[t]!=null?d.estoque[t]:""}" style="width:70px"></label>`).join("")}</div>`:""}
+function estUI(){const b=$("estbox");if(!b)return;
+ if(!d.tamanhos.length){b.innerHTML=`<label>Quantidade em estoque</label><p class="dica">Marque os tamanhos acima para informar a quantidade de cada um.</p>`;return}
+ b.innerHTML=`<label>Quantidade em estoque (de cada tamanho)</label><div class="est">${d.tamanhos.map(t=>`<label class="est-i"><span>${esc(t)}</span><input data-e="${esc(t)}" type="number" min="0" inputmode="numeric" placeholder="0" value="${d.estoque[t]!=null?d.estoque[t]:""}"></label>`).join("")}</div><p class="dica">Digite quantas peças tem de cada tamanho. Vazio = não controlar. 0 = esgotado.</p>`}
 function baixar(nome,linhas){const t="\ufeff"+linhas.map(r=>r.map(c=>'"'+String(c==null?"":c).replace(/"/g,'""')+'"').join(";")).join("\n"),a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t],{type:"text/csv;charset=utf-8"}));a.download=nome;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2000)}
 function backup(){const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([JSON.stringify({gerado:new Date().toISOString(),produtos:itens,pedidos,custos,despesas},null,1)],{type:"application/json"}));a.download="backup-"+dk(new Date())+".json";a.click()}
 const SQL_NOVO="alter table produtos add column if not exists estoque jsonb not null default '{}'::jsonb;\ncreate table if not exists despesas(id uuid primary key default gen_random_uuid(),descricao text not null,valor numeric not null,data date not null default current_date,criado timestamptz default now());\nalter table despesas enable row level security;\ndrop policy if exists \"admin despesas\" on despesas;\ncreate policy \"admin despesas\" on despesas for all to authenticated using(true) with check(true);";
