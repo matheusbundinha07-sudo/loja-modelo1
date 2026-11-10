@@ -2,7 +2,7 @@
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Sua loja | Catálogo</title><meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&family=Big+Shoulders+Display:wght@700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="config.js"></script>
@@ -122,11 +122,16 @@ cartUI();
 function prod(p){
  var T=tams(p);if(!tam||T.indexOf(tam)<0)tam=T[0];
  var F=fotos(p);if(fi>=F.length)fi=0;
- app.innerHTML='<a class="voltar" href="#">← Voltar</a><div class="detalhe"><div>'+img(p,fi)+(F.length>1?'<div class="galeria">'+F.map(function(u,i){return '<button type="button" data-i="'+i+'" class="'+(i===fi?"ativo":"")+'" aria-label="Foto '+(i+1)+'"><img src="'+esc(u)+'" alt=""></button>'}).join("")+'</div>':'')+'</div><div class="info"><h1>'+esc(p.nome)+'</h1><p class="preco">'+brl2(p)+'</p><p>'+esc(p.descricao)+'</p><p class="rotulo">Tamanho</p><div class="tams">'+T.map(function(t){return '<button data-t="'+esc(t)+'" class="'+(t===tam?"ativo":"")+'">'+esc(t)+'</button>'}).join("")+'</div><button class="zap" id="addc" type="button">Adicionar ao carrinho</button></div></div>';
+ app.innerHTML='<a class="voltar" href="#">← Voltar</a><div class="detalhe"><div><div class="gal">'+img(p,fi)+(F.length>1?'<button type="button" class="gs ant" data-g="-1" aria-label="Foto anterior">‹</button><button type="button" class="gs prox" data-g="1" aria-label="Próxima foto">›</button><span class="gc">'+(fi+1)+' / '+F.length+'</span>':'')+'</div>'+(F.length>1?'<div class="galeria">'+F.map(function(u,i){return '<button type="button" data-i="'+i+'" class="'+(i===fi?"ativo":"")+'" aria-label="Foto '+(i+1)+'"><img src="'+esc(u)+'" alt=""></button>'}).join("")+'</div>':'')+'</div><div class="info"><h1>'+esc(p.nome)+'</h1><p class="preco">'+brl2(p)+'</p><p>'+esc(p.descricao)+'</p><p class="rotulo">Tamanho</p><div class="tams">'+T.map(function(t){return '<button data-t="'+esc(t)+'" class="'+(t===tam?"ativo":"")+'">'+esc(t)+'</button>'}).join("")+'</div><button class="zap" id="addc" type="button">Adicionar ao carrinho</button></div></div>';
  app.querySelectorAll("[data-t]").forEach(function(b){b.onclick=function(){tam=b.dataset.t;prod(p)}});
  app.querySelectorAll("[data-i]").forEach(function(b){b.onclick=function(){fi=+b.dataset.i;prod(p)}});
  document.getElementById("addc").onclick=function(){addCart(p,tam)};
+ window._go=function(d){fi=(fi+d+F.length)%F.length;prod(p)};
+ app.querySelectorAll("[data-g]").forEach(function(b){b.onclick=function(){window._go(+b.dataset.g)}});
+ var gl=app.querySelector(".gal"),x0=null;
+ if(gl&&F.length>1){gl.addEventListener("touchstart",function(e){x0=e.touches[0].clientX},{passive:true});gl.addEventListener("touchend",function(e){if(x0===null)return;var dx=e.changedTouches[0].clientX-x0;x0=null;if(Math.abs(dx)>40)window._go(dx<0?1:-1)})}
 }
+document.addEventListener("keydown",function(e){if((e.key==="ArrowLeft"||e.key==="ArrowRight")&&app.querySelector(".gal .gs")&&!document.getElementById("cx").classList.contains("on")&&!/INPUT|TEXTAREA/.test(e.target.tagName||""))window._go(e.key==="ArrowLeft"?-1:1)});
 function rota(){var id=location.hash.slice(1),p=P.filter(function(x){return x.id===id})[0];if(p){tam=null;fi=0;prod(p)}else lista();scrollTo(0,0)}
 db.from("produtos").select("*").eq("ativo",true).order("criado",{ascending:false}).then(function(r){
  if(r.error){app.textContent="Não foi possível carregar o catálogo.";return}
