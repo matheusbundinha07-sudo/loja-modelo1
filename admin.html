@@ -94,7 +94,7 @@ button:disabled{opacity:.6}
 .mg{padding:8px 18px 14px}
 .mrow{padding:10px 0}
 .mrow+.mrow{border-top:1px solid var(--line)}
-.ml{display:flex;align-items:baseline;gap:10px;margin-bottom:7px}
+.ml{display:flex;align-items:center;gap:10px;margin-bottom:7px}
 .ml b{flex:1;min-width:0;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mn{color:var(--mut);font-weight:700;min-width:24px}
 .mq{font-weight:700;white-space:nowrap;font-size:.9rem}
@@ -384,7 +384,7 @@ function vendidos(){
  const com=itens.filter(p=>V(p)>0).sort((x,y)=>V(y)-V(x)||x.nome.localeCompare(y.nome,"pt"));
  const top=com.slice(0,10),max=top.length?V(top[0]):1;
  const total=com.reduce((s,p)=>s+V(p),0),rec=com.reduce((s,p)=>s+V(p)*(Number(p.preco)||0),0);
- const grafico=top.length?`<div class="mg" role="list">${top.map((p,i)=>`<div class="mrow" role="listitem"><div class="ml"><span class="mn">${i+1}º</span><b title="${esc(p.nome)}">${esc(p.nome)}</b><span class="mq">${V(p)} ${V(p)===1?"venda":"vendas"} · ${Math.round(V(p)/total*100)}%</span></div><div class="bar"><i style="width:${Math.max(3,V(p)/max*100)}%"></i></div></div>`).join("")}</div>`:`<p class="vazio3">Nenhuma venda ainda. Assim que você finalizar vendas no Caixa, o gráfico aparece aqui.</p>`;
+ const grafico=top.length?`<div class="mg" role="list">${top.map((p,i)=>`<div class="mrow" role="listitem"><div class="ml"><span class="mn">${i+1}º</span>${thumb(p)}<b title="${esc(p.nome)}">${esc(p.nome)}</b><span class="mq">${V(p)} ${V(p)===1?"venda":"vendas"} · ${Math.round(V(p)/total*100)}%</span></div><div class="bar"><i style="width:${Math.max(3,V(p)/max*100)}%"></i></div></div>`).join("")}</div>`:`<p class="vazio3">Nenhuma venda ainda. Assim que você finalizar vendas no Caixa, o gráfico aparece aqui.</p>`;
  $("vend").innerHTML=`<h1>Mais vendidos</h1><p class="sub">Só o que já foi vendido, em números.</p>
 ${tem?"":`<div class="warn"><b>Falta um passo no Supabase para contar as vendas.</b> Abra o SQL Editor, cole o comando abaixo e clique em Run. Depois atualize esta página.<code>${SQL_VENDAS}</code><button class="sec" id="cp">Copiar comando</button></div>`}
 <div class="cards"><div class="kpi"><small>Peças vendidas</small><b>${total}</b></div><div class="kpi"><small>Receita estimada</small><b>${brl(rec)}</b></div><div class="kpi"><small>Produto líder</small><b>${com.length?esc(com[0].nome):"—"}</b></div></div>
