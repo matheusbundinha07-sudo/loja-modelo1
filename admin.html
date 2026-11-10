@@ -222,7 +222,7 @@ function lista(){
  $("novo").onclick=()=>abrir("novo");
  rows();
 }
-function thumb(p){return p.foto_url?`<img src="${esc(p.foto_url)}" alt="">`:`<div class="th"></div>`}
+function thumb(p){return p.foto_url?`<img class="th" src="${esc(p.foto_url)}" alt="">`:`<div class="th"></div>`}
 function rows(){
  const q=busca.toLowerCase(),l=itens.filter(p=>p.nome.toLowerCase().includes(q)&&(!catF||p.categoria===catF));
  $("rows").innerHTML=l.map(p=>`<div class="it${p.id===sel?" on":""}" data-id="${p.id}">${thumb(p)}<div class="inf"><b>${esc(p.nome)}</b><span>${brl(Number(p.preco))}${p.categoria?" · "+esc(p.categoria):""}${p.ativo?"":" · oculto"}${baixo(p)?` · <span class="low">estoque baixo</span>`:""}</span></div>${p.mais_vendido?`<span class="tag" title="Mais vendido">★</span>`:""}</div>`).join("")||`<p class="dica">Nenhum produto.</p>`;
