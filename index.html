@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sua loja | Catálogo</title><meta name="theme-color" content="#e4e4e1">
+<title>Sua loja | Catálogo</title><meta name="theme-color" content="#ffffff">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Big+Shoulders+Display:wght@800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="config.js"></script>
 </head>
 <body>
-<div class="aviso"><div class="trilho" id="tr"><div class="grupo"><span>Enviamos</span><span>Todas as formas de pagamento</span></div></div></div>
+<div class="aviso">Enviamos · Todas as formas de pagamento</div>
 <header class="topo"><a class="marca" href="#">Sua loja</a>
 <nav><a href="#">Catálogo</a><a id="contato" target="_blank" rel="noopener">Contato</a><button class="cx-btn" id="cxbtn" type="button" aria-label="Abrir carrinho">Carrinho<i id="cxn">0</i></button></nav></header>
 <main class="wrap" id="app">Carregando...</main>
@@ -16,7 +16,6 @@
 <footer><span id="rod"></span></footer>
 <script>
 document.title="Sua loja | Catálogo";document.getElementById("rod").textContent="© Sua loja";
-(function(){var g=["Enviamos","Todas as formas de pagamento"],h="";for(var i=0;i<6;i++)g.forEach(function(t){h+="<span>"+t+"</span>"});document.getElementById("tr").innerHTML='<div class="grupo">'+h+'</div><div class="grupo" aria-hidden="true">'+h+'</div>'})();
 document.getElementById("contato").href="https://wa.me/"+WHATSAPP;
 var db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY),app=document.getElementById("app"),fi=0,P=[],cat="Todos",tam=null,sel=[],vari=null,aberto=null;
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
