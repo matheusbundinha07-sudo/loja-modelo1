@@ -374,17 +374,18 @@ ${semPed?AVISO_SQL:""}
 ${semC?`<div class="warn">Alguns produtos vendidos estão <b>sem custo</b> cadastrado, então o lucro pode estar maior que o real. Preencha os custos mais abaixo.</div>`:""}
 <div class="box"><h2>Receita e lucro<small>${per==="12"?"por mês":"por dia"}</small></h2><div class="gbox">${nc?grafico(B):`<p class="vazio3" style="padding:12px 0">Nenhuma venda concluída neste período.</p>`}</div><div class="leg"><span><i style="background:#111"></i>Receita</span><span><i style="background:#1b7f3b"></i>Lucro</span></div></div>
 <div class="box"><h2>Pedidos no período<small>${tot} no total</small></h2><div class="gbox"><div class="bar" style="height:14px;display:flex"><i style="width:${pc(nc)}%;background:#1b7f3b;border-radius:0"></i><i style="width:${pc(np)}%;background:#e0a800;border-radius:0"></i><i style="width:${pc(nx)}%;background:#b3261e;border-radius:0"></i></div></div><div class="leg"><span><i style="background:#1b7f3b"></i>Concluídas: ${nc}</span><span><i style="background:#e0a800"></i>Pendentes: ${np}</span><span><i style="background:#b3261e"></i>Não concluídas: ${nx}</span></div></div>
-<div class="box"><h2>Custo dos produtos<small>quanto você paga em cada peça (só você vê)</small></h2>${itens.map(p=>`<div class="vr" data-id="${esc(p.id)}">${thumb(p)}<div class="inf"><b>${esc(p.nome)}</b><span>Venda: ${brl(Number(p.preco))}</span></div><label class="cinp">Custo R$<input inputmode="decimal" placeholder="0,00" value="${custos[p.id]!=null?String(custos[p.id]).replace(".",","):""}" aria-label="Custo de ${esc(p.nome)}"${semPed?" disabled":""}></label></div>`).join("")||`<p class="vazio3">Nenhum produto cadastrado.</p>`}</div>`;
+<div class="box"><h2>Custo dos produtos<small>quanto você paga em cada peça (só você vê)</small></h2>${itens.map(p=>`<div class="vr" data-id="${esc(p.id)}">${thumb(p)}<div class="inf"><b>${esc(p.nome)}</b><span>Venda: ${brl(Number(p.preco))}</span></div><label class="cinp">Custo R$<input inputmode="decimal" placeholder="0,00" value="${custos[p.id]!=null?String(custos[p.id]).replace(".",","):""}" aria-label="Custo de ${esc(p.nome)}"${semPed?" disabled":""}></label><button class="sec" data-ap${semPed?" disabled":""}>Aplicar</button></div>`).join("")||`<p class="vazio3">Nenhum produto cadastrado.</p>`}</div>`;
  $("vend").querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{per=b.dataset.p;lucroUI()});
  $("vend").insertAdjacentHTML("beforeend",despBox());despBind();
- $("vend").querySelectorAll(".vr").forEach(r=>{
+ $("vend").querySelectorAll(".vr[data-id]").forEach(r=>{
   const p=itens.find(x=>String(x.id)===r.dataset.id),i=r.querySelector("input"),volta=()=>{i.value=custos[p.id]!=null?String(custos[p.id]).replace(".",","):""};
-  i.onchange=async()=>{
+  const ap=async()=>{
    if(!i.value.trim()){const x=await db.from("custos").delete().eq("produto_id",String(p.id));if(x.error){alert("Erro ao salvar o custo.");volta();return}delete custos[p.id]}
    else{const v=num(i.value);if(isNaN(v)||v<0){alert("Digite um valor válido, ex: 45,90");volta();return}
     const x=await db.from("custos").upsert({produto_id:String(p.id),custo:v});if(x.error){alert("Erro ao salvar o custo.");volta();return}custos[p.id]=v}
    lucroUI();
   };
+  r.querySelector("[data-ap]").onclick=ap;i.onkeydown=e=>{if(e.key==="Enter")ap()};
  });
 }
 
@@ -422,16 +423,16 @@ function lCart(){
  const sub=cartL.reduce((s,i)=>s+i.p*i.q,0),qt=cartL.reduce((s,i)=>s+i.q,0),dsc=Math.min(sub,Math.max(0,num(descL)||0)),tot=sub-dsc,rec=num(recL),troco=pagL==="Dinheiro"&&!isNaN(rec)&&rec>=tot?rec-tot:null;
  $("lcart").innerHTML=`<h2>Venda atual<small>${qt} ${qt===1?"peça":"peças"}</small></h2>${flashL?`<div class="lok">${esc(flashL)}</div>`:""}
 ${cartL.map((i,k)=>`<div class="vr" data-k="${k}"><div class="inf"><b>${esc(i.n)}</b><span>Tam. ${esc(i.t)}</span></div><div class="step"><button type="button" data-d="-1" aria-label="Menos">−</button><span style="min-width:22px;text-align:center">${i.q}</span><button type="button" data-d="1" aria-label="Mais">+</button></div><label class="cinp">R$<input data-pr inputmode="decimal" value="${String(i.p).replace(".",",")}" style="width:84px" aria-label="Preço de ${esc(i.n)}"></label></div>`).join("")||`<p class="vazio3">Toque no tamanho de um produto para adicionar à venda.</p>`}
-<div style="padding:14px 18px;border-top:1px solid var(--line)"><label>Forma de pagamento</label><div class="seg">${PAGS.map(x=>`<button type="button" data-pg="${x}" class="${pagL===x?"on":""}">${x}</button>`).join("")}</div><label>Cliente (opcional)</label><input id="lcli" value="${esc(cliL)}" placeholder="Nome do cliente"><label>Desconto (R$)</label><input id="ldesc" inputmode="decimal" placeholder="0,00" value="${esc(descL)}">${pagL==="Dinheiro"?`<label style="margin-top:10px">Valor recebido (R$)</label><input id="lrec" inputmode="decimal" placeholder="0,00" value="${esc(recL)}">${troco!==null?`<p class="msg" style="margin:6px 0 0"><b>Troco: ${brl(troco)}</b></p>`:""}`:""}<div class="ltot"><span>Total</span><b>${brl(tot)}</b></div><button class="pri" id="lfim" style="width:100%"${cartL.length&&!semPed?"":" disabled"}>✅ Finalizar venda</button>${cartL.length?`<button class="sec" id="llimpa" style="width:100%;margin-top:8px">Limpar</button>`:""}</div>`;
+<div style="padding:14px 18px;border-top:1px solid var(--line)"><label>Forma de pagamento</label><div class="seg">${PAGS.map(x=>`<button type="button" data-pg="${x}" class="${pagL===x?"on":""}">${x}</button>`).join("")}</div><label>Cliente (opcional)</label><input id="lcli" value="${esc(cliL)}" placeholder="Nome do cliente"><label>Desconto (R$)</label><div style="display:flex;gap:8px"><input id="ldesc" inputmode="decimal" placeholder="0,00" value="${esc(descL)}"><button type="button" class="sec" id="adesc">Aplicar</button></div>${pagL==="Dinheiro"?`<label style="margin-top:10px">Valor recebido (R$)</label><div style="display:flex;gap:8px"><input id="lrec" inputmode="decimal" placeholder="0,00" value="${esc(recL)}"><button type="button" class="sec" id="arec">Aplicar</button></div>${troco!==null?`<p class="msg" style="margin:6px 0 0"><b>Troco: ${brl(troco)}</b></p>`:""}`:""}<div class="ltot"><span>Total</span><b>${brl(tot)}</b></div><button class="pri" id="lfim" style="width:100%"${cartL.length&&!semPed?"":" disabled"}>✅ Finalizar venda</button>${cartL.length?`<button class="sec" id="llimpa" style="width:100%;margin-top:8px">Limpar</button>`:""}</div>`;
  const c=$("lcart");
  c.querySelectorAll(".vr").forEach(r=>{const i=cartL[+r.dataset.k];
   r.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{i.q+=Number(b.dataset.d);if(i.q<1)cartL.splice(+r.dataset.k,1);lCart()});
   r.querySelector("[data-pr]").onchange=e=>{const v=num(e.target.value);if(isNaN(v)||v<0){alert("Digite um preço válido, ex: 89,90");lCart();return}i.p=v;lCart()}});
  c.querySelectorAll("[data-pg]").forEach(b=>b.onclick=()=>{pagL=b.dataset.pg;lCart()});
- $("lcli").oninput=e=>{cliL=e.target.value};$("ldesc").onchange=e=>{descL=e.target.value;lCart()};if($("lrec"))$("lrec").onchange=e=>{recL=e.target.value;lCart()};
+ $("lcli").oninput=e=>{cliL=e.target.value};const ad=()=>{descL=$("ldesc").value;if($("lrec"))recL=$("lrec").value;lCart()};$("adesc").onclick=ad;$("ldesc").onkeydown=e=>{if(e.key==="Enter")ad()};if($("lrec")){$("arec").onclick=ad;$("lrec").onkeydown=e=>{if(e.key==="Enter")ad()}};
  $("lfim").onclick=fimL;if($("llimpa"))$("llimpa").onclick=()=>{cartL=[];lCart()};
 }
-async function fimL(){
+async function fimL(){if($("ldesc"))descL=$("ldesc").value;
  if(!cartL.length)return;
  const b=$("lfim");b.disabled=true;b.textContent="Salvando...";
  const its=cartL.map(i=>({id:i.id,n:i.n,p:i.p,t:i.t,q:i.q}));{const dsc=Math.min(its.reduce((s,i)=>s+i.p*i.q,0),Math.max(0,num(descL)||0));if(dsc>0)its.push({id:null,n:"Desconto",p:-dsc,t:"-",q:1})}const total=its.reduce((s,i)=>s+i.p*i.q,0);
@@ -519,17 +520,18 @@ const promoOn=p=>{const v=Number(p.preco_promo);return v>0&&v<Number(p.preco)&&(
 const pe=p=>promoOn(p)?Number(p.preco_promo):Number(p.preco)||0;
 async function setPromo(ps,f,at){for(const p of ps){const u={preco_promo:f(p),promo_ate:at||null},r=await db.from("produtos").update(u).eq("id",p.id);if(r.error){alert("Erro ao salvar a promoção. Rode o SQL mostrado nesta tela.");return false}Object.assign(p,u)}return true}
 function promoUI(){
+ if(promoTab==="cupons")return cupomUI();
  const tem=!itens.length||"preco_promo" in itens[0],on=itens.filter(promoOn);
- $("vend").innerHTML=`<h1>Promoções</h1><p class="sub">Defina um preço promocional por produto ou aplique desconto em vários de uma vez. A loja mostra o preço antigo riscado e o Caixa já usa o preço da promoção.</p>
+ $("vend").innerHTML=`<h1>Promoções</h1>${ptabs()}<p class="sub">Defina um preço promocional por produto ou aplique desconto em vários de uma vez. A loja mostra o preço antigo riscado e o Caixa já usa o preço da promoção.</p>
 ${tem?"":`<div class="warn"><b>Falta um passo no Supabase.</b> Cole no SQL Editor, clique em Run e atualize a página.<code>${esc(SQL_PROMO)}</code><button class="sec" id="cp">Copiar comando</button></div>`}
 <div class="box"><h2>Desconto em massa<small>${on.length} em promoção agora</small></h2><div class="vr" style="flex-wrap:wrap"><label class="cinp">%<input id="pp" inputmode="decimal" placeholder="20" style="width:70px"></label><select id="pc" style="flex:1;min-width:150px"><option value="">Todas as categorias</option>${CATEGORIAS.map(c=>`<option>${esc(c)}</option>`).join("")}</select><label class="cinp">até<input id="pd" type="date"></label><button class="pri" id="pa"${tem?"":" disabled"}>Aplicar</button><button class="sec" id="pe"${tem?"":" disabled"}>Encerrar todas</button></div></div>
-<div class="box"><h2>Produtos<small>preço promocional e data final (opcional)</small></h2>${itens.map(p=>`<div class="vr" data-id="${esc(p.id)}">${thumb(p)}<div class="inf"><b>${esc(p.nome)}</b><span>${brl(Number(p.preco))}${promoOn(p)?` <span class="pill c">em promoção</span>`:""}</span></div><label class="cinp">R$<input data-v inputmode="decimal" placeholder="promo" style="width:90px" value="${p.preco_promo!=null?String(p.preco_promo).replace(".",","):""}"${tem?"":" disabled"}></label><label class="cinp">até<input data-d type="date" value="${esc(p.promo_ate||"")}"${tem?"":" disabled"}></label></div>`).join("")||`<p class="vazio3">Nenhum produto.</p>`}</div>`;
- if($("cp"))$("cp").onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(SQL_PROMO);$("cp").textContent="Copiado!"};
+<div class="box"><h2>Produtos<small>preço promocional e data final (opcional)</small></h2>${itens.map(p=>`<div class="vr" data-id="${esc(p.id)}">${thumb(p)}<div class="inf"><b>${esc(p.nome)}</b><span>${brl(Number(p.preco))}${promoOn(p)?` <span class="pill c">em promoção</span>`:""}</span></div><label class="cinp">R$<input data-v inputmode="decimal" placeholder="promo" style="width:90px" value="${p.preco_promo!=null?String(p.preco_promo).replace(".",","):""}"${tem?"":" disabled"}></label><label class="cinp">até<input data-d type="date" value="${esc(p.promo_ate||"")}"${tem?"":" disabled"}></label><button class="sec" data-ap${tem?"":" disabled"}>Aplicar</button></div>`).join("")||`<p class="vazio3">Nenhum produto.</p>`}</div>`;
+ ptBind();if($("cp"))$("cp").onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(SQL_PROMO);$("cp").textContent="Copiado!"};
  $("pa").onclick=async()=>{const x=num($("pp").value),c=$("pc").value,l=itens.filter(p=>!c||p.categoria===c);if(isNaN(x)||x<=0||x>=100){alert("Digite um desconto entre 1 e 99, ex: 20");return}if(!l.length||!confirm("Aplicar "+x+"% de desconto em "+l.length+" produto(s)?"))return;if(await setPromo(l,p=>Math.round(Number(p.preco)*(100-x))/100,$("pd").value))promoUI()};
  $("pe").onclick=async()=>{const l=itens.filter(p=>p.preco_promo!=null);if(!l.length||!confirm("Encerrar todas as promoções?"))return;if(await setPromo(l,()=>null,null))promoUI()};
  $("vend").querySelectorAll(".vr[data-id]").forEach(r=>{const p=itens.find(x=>String(x.id)===r.dataset.id),v=r.querySelector("[data-v]"),d=r.querySelector("[data-d]");
   const sv=async()=>{const t=v.value.trim(),n=t?num(t):null;if(t&&(isNaN(n)||n<=0||n>=Number(p.preco))){alert("O preço promocional deve ser menor que "+brl(Number(p.preco))+".");promoUI();return}if(await setPromo([p],()=>n,t?d.value:null))promoUI()};
-  v.onchange=sv;d.onchange=sv});
+  r.querySelector("[data-ap]").onclick=sv;v.onkeydown=e=>{if(e.key==="Enter")sv()}});
 }
 // ===== CALCULADORA E CALENDÁRIO =====
 var cal={cur:"0",prev:null,op:null,fresh:false},calM=null,calD=null;
@@ -563,6 +565,41 @@ function calUI(){
  document.querySelectorAll(".kp button").forEach(b=>b.onclick=()=>calcKey(b.dataset.k));
  document.querySelectorAll(".dy").forEach(b=>b.onclick=()=>{calD=b.dataset.k;calUI()});
  $("cpv").onclick=()=>{calM=new Date(y,m-1,1);calUI()};$("cnx").onclick=()=>{calM=new Date(y,m+1,1);calUI()};
+}
+
+// ===== CUPONS =====
+const SQL_CUPOM=`create table if not exists cupons(codigo text primary key,tipo text not null check (tipo in ('percent','valor')),valor numeric not null,minimo numeric not null default 0,valido_ate date,ativo boolean not null default true,criado timestamptz default now());
+alter table cupons enable row level security;
+drop policy if exists "admin cupons" on cupons;
+create policy "admin cupons" on cupons for all to authenticated using(true) with check(true);
+create or replace function validar_cupom(p_codigo text, p_total numeric) returns jsonb language plpgsql security definer set search_path=public as $$
+declare c cupons%rowtype;
+begin
+ select * into c from cupons where codigo=upper(trim(p_codigo)) and ativo;
+ if not found then return jsonb_build_object('ok',false,'msg','Cupom inválido.'); end if;
+ if c.valido_ate is not null and c.valido_ate<current_date then return jsonb_build_object('ok',false,'msg','Este cupom expirou.'); end if;
+ if p_total<c.minimo then return jsonb_build_object('ok',false,'msg','Pedido mínimo de R$ '||to_char(c.minimo,'FM999990.00')||' para usar este cupom.'); end if;
+ return jsonb_build_object('ok',true,'codigo',c.codigo,'tipo',c.tipo,'valor',c.valor,'minimo',c.minimo);
+end $$;
+grant execute on function validar_cupom(text,numeric) to anon, authenticated;`;
+var promoTab="precos",cupons=[],semCup=false,cupCarregado=false;
+const ptabs=()=>`<div class="vr" style="border:0;padding:0 0 14px;gap:8px"><button class="${promoTab==="precos"?"pri":"sec"}" data-pt="precos">Preços promocionais</button><button class="${promoTab==="cupons"?"pri":"sec"}" data-pt="cupons">Cupons</button></div>`;
+const ptBind=()=>document.querySelectorAll("[data-pt]").forEach(b=>b.onclick=()=>{promoTab=b.dataset.pt;promoUI()});
+async function cupomUI(){
+ if(!cupCarregado){$("vend").innerHTML='<p class="sub">Carregando…</p>';const r=await db.from("cupons").select("*").order("criado",{ascending:false});semCup=!!r.error;cupons=r.error?[]:r.data;cupCarregado=true}
+ const nm=c=>"Cupom "+c.codigo,usos=c=>pedidos.filter(o=>o.status!=="cancelada"&&itensDe(o).some(i=>i.n===nm(c))),on=c=>c.ativo&&(!c.valido_ate||String(c.valido_ate)>=dk(new Date()));
+ $("vend").innerHTML=`<h1>Promoções</h1>${ptabs()}<p class="sub">Crie cupons de desconto. O cliente digita o código no carrinho da loja e o desconto entra no total do pedido.</p>
+${semCup?`<div class="warn"><b>Falta um passo no Supabase.</b> Cole no SQL Editor, clique em Run e atualize a página.<code style="white-space:pre-wrap">${esc(SQL_CUPOM)}</code><button class="sec" id="cp">Copiar comando</button></div>`:""}
+<div class="box"><h2>Novo cupom</h2><div class="vr" style="flex-wrap:wrap"><input id="kc" placeholder="Código, ex: BEMVINDO10" style="flex:2;min-width:150px;text-transform:uppercase"><select id="kt"><option value="percent">% de desconto</option><option value="valor">R$ de desconto</option></select><input id="kv" inputmode="decimal" placeholder="Valor" style="width:90px"></div><div class="vr" style="flex-wrap:wrap"><label class="cinp">Pedido mínimo R$<input id="km" inputmode="decimal" placeholder="0,00"></label><label class="cinp">Válido até<input id="kd" type="date"></label><button class="pri" id="ka"${semCup?" disabled":""}>Criar cupom</button></div></div>
+<div class="box"><h2>Meus cupons<small>${cupons.length}</small></h2>${cupons.map(c=>{const u=usos(c),tot=u.reduce((a,o)=>a+Math.abs(itensDe(o).filter(i=>i.n===nm(c)).reduce((x,i)=>x+i.p*i.q,0)),0);return `<div class="vr"><div class="inf"><b>${esc(c.codigo)}</b><span>${c.tipo==="percent"?esc(c.valor)+"% de desconto":brl(Number(c.valor))+" de desconto"}${Number(c.minimo)>0?" · mín. "+brl(Number(c.minimo)):""}${c.valido_ate?" · até "+esc(String(c.valido_ate).split("-").reverse().join("/")):""} · ${on(c)?"ativo":c.ativo?"expirado":"desativado"} · usado ${u.length}x (${brl(tot)} em descontos)</span></div><button class="sec" data-kt="${esc(c.codigo)}">${c.ativo?"Desativar":"Ativar"}</button><button class="sec" data-kx="${esc(c.codigo)}" aria-label="Excluir cupom">×</button></div>`}).join("")||`<p class="vazio3">Nenhum cupom criado ainda.</p>`}</div>`;
+ ptBind();if($("cp"))$("cp").onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText(SQL_CUPOM);$("cp").textContent="Copiado!"};
+ $("ka").onclick=async()=>{const c=$("kc").value.trim().toUpperCase().replace(/\s+/g,""),v=num($("kv").value),t=$("kt").value,m=$("km").value.trim()?num($("km").value):0;
+  if(!c||isNaN(v)||v<=0||(t==="percent"&&v>100)||isNaN(m)||m<0){alert("Preencha o código e um valor válido (a porcentagem vai até 100).");return}
+  if(cupons.some(x=>x.codigo===c)){alert("Já existe um cupom com esse código.");return}
+  const r=await db.from("cupons").insert({codigo:c,tipo:t,valor:v,minimo:m,valido_ate:$("kd").value||null}).select().single();
+  if(r.error){alert("Erro ao criar o cupom. Rode o SQL mostrado nesta tela.");return}cupons.unshift(r.data);cupomUI()};
+ document.querySelectorAll("[data-kt]").forEach(b=>b.onclick=async()=>{const c=cupons.find(x=>x.codigo===b.dataset.kt),r=await db.from("cupons").update({ativo:!c.ativo}).eq("codigo",c.codigo);if(r.error){alert("Erro ao salvar.");return}c.ativo=!c.ativo;cupomUI()});
+ document.querySelectorAll("[data-kx]").forEach(b=>b.onclick=async()=>{if(!confirm("Excluir este cupom?"))return;const r=await db.from("cupons").delete().eq("codigo",b.dataset.kx);if(r.error){alert("Erro ao excluir.");return}cupons=cupons.filter(x=>x.codigo!==b.dataset.kx);cupomUI()});
 }
 db.auth.getSession().then(r=>r.data.session?carregar():login());
 </script></body></html>
