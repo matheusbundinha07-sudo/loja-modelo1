@@ -258,6 +258,7 @@ svg[aria-label] rect{transform-box:fill-box;transform-origin:50% 100%;animation:
 .tel{transition:transform .3s,box-shadow .3s}
 .tel:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.12)}
 
+.sec.feito{background:#e6f6ea;border-color:#1b7f3b;color:#1b7f3b}
 @media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
 </style></head>
 <body><div id="root"></div>
@@ -448,6 +449,10 @@ function grafico(B){
  });
  return s+"</svg>";
 }
+async function recalcPed(p){
+ const l=pedidos.filter(o=>o.status==="concluida"&&!(Number(o.custo)>0)&&itensDe(o).some(i=>String(i.id)===String(p.id)));
+ for(const o of l){const c=custoCalc(itensDe(o));if(c>0){const r=await db.from("pedidos").update({custo:c}).eq("id",o.id);if(!r.error)o.custo=c}}
+}
 function lucroUI(){
  const B=periodoBuckets(),idx={};B.forEach(b=>idx[b.k]=b);
  const key=o=>{const x=new Date(o.criado);return per==="12"?x.getFullYear()+"-"+pad(x.getMonth()+1):dk(x)};
@@ -476,7 +481,9 @@ ${semC?`<div class="warn">Alguns produtos vendidos estão <b>sem custo</b> cadas
    if(!i.value.trim()){const x=await db.from("custos").delete().eq("produto_id",String(p.id));if(x.error){alert("Erro ao salvar o custo.");volta();return}delete custos[p.id]}
    else{const v=num(i.value);if(isNaN(v)||v<0){alert("Digite um valor válido, ex: 45,90");volta();return}
     const x=await db.from("custos").upsert({produto_id:String(p.id),custo:v});if(x.error){alert("Erro ao salvar o custo.");volta();return}custos[p.id]=v}
+   const okId=String(p.id);if(!i.value.trim()===false)await recalcPed(p);
    lucroUI();
+   {const nb=$("vend").querySelector('.vr[data-id="'+okId+'"] [data-ap]');if(nb&&i.value.trim()){nb.textContent="Aplicado ✓";nb.classList.add("feito");setTimeout(()=>{nb.textContent="Aplicar";nb.classList.remove("feito")},1800)}}
   };
   r.querySelector("[data-ap]").onclick=ap;i.onkeydown=e=>{if(e.key==="Enter")ap()};
  });
