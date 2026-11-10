@@ -1,55 +1,22 @@
 <!DOCTYPE html>
 <html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Catálogo</title><link rel="stylesheet" href="style.css">
+<title>Sua loja | Catálogo</title><meta name="theme-color" content="#e4e4e1">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Big+Shoulders+Display:wght@800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script src="config.js"></script>
-<style>
-.intro{text-align:center}
-img.lema-img{display:block;width:min(560px,90%);height:auto;margin:0 auto 10px}
-button.zap{border:0;font:inherit;cursor:pointer}
-.galeria{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.galeria button{width:56px;height:70px;padding:0;border:2px solid transparent;border-radius:6px;overflow:hidden;background:#f2f2ef;cursor:pointer;opacity:.7}
-.galeria button.ativo{border-color:#111;opacity:1}
-.galeria img{width:100%;height:100%;object-fit:cover;display:block}
-.cx-btn{border:0;background:none;font:inherit;color:inherit;cursor:pointer;padding:0}
-.cx-btn i{font-style:normal;display:inline-block;min-width:20px;padding:1px 6px;margin-left:4px;border-radius:10px;background:#111;color:#fff;font-size:.75rem;text-align:center}
-.cx{position:fixed;inset:0;z-index:50;display:none}.cx.on{display:block}
-.cx-ov{position:absolute;inset:0;background:rgba(0,0,0,.45)}
-.cx-p{position:absolute;top:0;right:0;bottom:0;width:min(400px,100%);background:#fff;display:flex;flex-direction:column;box-shadow:-8px 0 30px rgba(0,0,0,.15)}
-.cx-h{display:flex;justify-content:space-between;align-items:center;padding:16px 18px;border-bottom:1px solid #e4e4e0;font-size:1.05rem}
-.cx-h button{border:0;background:none;font-size:1.8rem;line-height:1;cursor:pointer;color:#555}
-.cx-b{flex:1;overflow:auto;padding:6px 18px}
-.cx-v{padding:40px 0;text-align:center;color:#777}
-.cx-i{display:flex;gap:12px;padding:14px 0;border-bottom:1px solid #eee}
-.cx-i img,.cx-i .cx-f0{width:56px;height:70px;object-fit:cover;border-radius:6px;background:#f2f2ef;flex:none}
-.cx-i .cx-d{flex:1;min-width:0}.cx-i b{display:block;font-weight:600}.cx-i small{color:#777}
-.cx-q{display:flex;align-items:center;gap:6px;margin-top:8px}
-.cx-q button{width:30px;height:30px;border:1px solid #d6d6d1;border-radius:8px;background:#fff;font-size:1rem;cursor:pointer}
-.cx-q span{min-width:22px;text-align:center}
-.cx-q .cx-r{width:auto;margin-left:auto;border:0;background:none;color:#b3261e;font-size:.8rem;text-decoration:underline}
-.cx-pr{font-weight:600;white-space:nowrap}
-.cx-f{padding:16px 18px;border-top:1px solid #e4e4e0;display:none}
-.cx-f.on{display:block}
-.cx-t{display:flex;justify-content:space-between;font-size:1.1rem;font-weight:700;margin-bottom:12px}
-.cx-c{display:block;background:#111;color:#fff;text-align:center;text-decoration:none;padding:14px;border-radius:8px;font-weight:700}
-button.cx-c{width:100%;border:0;font:inherit;font-weight:700;cursor:pointer}
-.cx-fm{margin-bottom:12px}.cx-fm label{display:block;font-size:.8rem;font-weight:600;color:#555;margin:0 0 4px}
-.cx-fm input{width:100%;padding:11px 12px;border:1px solid #d6d6d1;border-radius:8px;font:inherit;margin-bottom:10px;box-sizing:border-box}
-.cx-fm input:focus-visible{outline:2px solid #111;outline-offset:1px}
-.cx-fm input.bad{border-color:#b3261e}
-.cx-e{color:#b3261e;font-size:.85rem;margin:-4px 0 10px;min-height:0}
-.cx-k{display:block;width:100%;margin-top:8px;padding:10px;border:0;background:none;color:#555;cursor:pointer;font:inherit;text-decoration:underline}
-</style>
 </head>
 <body>
-<div class="aviso">Enviamos · Todas as formas de pagamento</div>
-<header class="topo"><a class="marca" href="#"><b style="font-size:1.15rem;letter-spacing:-.01em;color:inherit">Sua loja</b></a>
+<div class="aviso"><div class="trilho" id="tr"><div class="grupo"><span>Enviamos</span><span>Todas as formas de pagamento</span></div></div></div>
+<header class="topo"><a class="marca" href="#">Sua loja</a>
 <nav><a href="#">Catálogo</a><a id="contato" target="_blank" rel="noopener">Contato</a><button class="cx-btn" id="cxbtn" type="button" aria-label="Abrir carrinho">Carrinho<i id="cxn">0</i></button></nav></header>
 <main class="wrap" id="app">Carregando...</main>
 <div class="cx" id="cx"><div class="cx-ov" data-x></div><aside class="cx-p" role="dialog" aria-label="Carrinho"><div class="cx-h"><b>Carrinho</b><button type="button" data-x aria-label="Fechar">×</button></div><div class="cx-b" id="cxb"></div><div class="cx-f" id="cxf"><div class="cx-t"><span>Total</span><span id="cxt"></span></div><div class="cx-fm"><label for="cxnome">Nome *</label><input id="cxnome" autocomplete="name" placeholder="Seu nome"><label for="cxtel">Telefone (opcional)</label><input id="cxtel" type="tel" inputmode="tel" autocomplete="tel" placeholder="(32) 99999-9999"><p class="cx-e" id="cxe" role="alert"></p></div><button class="cx-c" id="cxc" type="button">Comprar</button><button class="cx-k" type="button" data-x>Continuar comprando</button></div></aside></div>
 <footer><span id="rod"></span></footer>
 <script>
 document.title="Sua loja | Catálogo";document.getElementById("rod").textContent="© Sua loja";
+(function(){var g=["Enviamos","Todas as formas de pagamento"],h="";for(var i=0;i<6;i++)g.forEach(function(t){h+="<span>"+t+"</span>"});document.getElementById("tr").innerHTML='<div class="grupo">'+h+'</div><div class="grupo" aria-hidden="true">'+h+'</div>'})();
 document.getElementById("contato").href="https://wa.me/"+WHATSAPP;
 var db=supabase.createClient(SUPABASE_URL,SUPABASE_KEY),app=document.getElementById("app"),fi=0,P=[],cat="Todos",tam=null,sel=[],vari=null,aberto=null;
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
@@ -82,7 +49,7 @@ function lista(){
  var abas=cats.map(function(c){var v=VV[c],at=c===cat?" ativo":"";
   if(!v)return '<button class="aba'+at+'" data-c="'+esc(c)+'">'+esc(c)+'</button>';
   return '<div class="drop'+(aberto===c?" aberto":"")+'"><button class="aba'+at+'" data-c="'+esc(c)+'">'+esc(c)+'<span class="seta"></span></button><div class="menu"><button data-vc="'+esc(c)+'" data-v="" class="'+(c===cat&&!vari?"ativo":"")+'">Todas</button>'+v.map(function(x){return '<button data-vc="'+esc(c)+'" data-v="'+esc(x)+'" class="'+(c===cat&&vari===x?"ativo":"")+'">'+esc(x)+'</button>'}).join("")+'</div></div>'}).join("");
- app.innerHTML='<div class="intro"><h1 style="margin:0 0 6px;font-size:2.2rem;letter-spacing:-.02em">Sua loja</h1></div><div class="abas">'+abas+'</div><div class="loja"><aside class="filtro"><h3>Tamanho</h3><div class="tams">'+TT.map(function(t){return '<button data-f="'+esc(t)+'" class="'+(sel.indexOf(t)>=0?"ativo":"")+'">'+esc(t)+'</button>'}).join("")+'</div>'+(sel.length?'<button class="limpar" id="limpar">Limpar filtro</button>':'')+'</aside><div><p class="conta">'+it.length+(it.length===1?" produto":" produtos")+(vari?" · "+esc(vari):"")+'</p>'+(it.length?'<div class="grade">'+it.map(function(p){return '<a class="card" href="#'+p.id+'">'+img(p)+'<h2>'+esc(p.nome)+'</h2><p>'+brl2(p)+'</p></a>'}).join("")+'</div>':'<p class="conta">Nenhum produto nesse tamanho.</p>')+'</div></div>';
+ app.innerHTML='<div class="intro"><h1>Sua loja</h1></div><div class="abas">'+abas+'</div><div class="loja"><aside class="filtro"><h3>Tamanho</h3><div class="tams">'+TT.map(function(t){return '<button data-f="'+esc(t)+'" class="'+(sel.indexOf(t)>=0?"ativo":"")+'">'+esc(t)+'</button>'}).join("")+'</div>'+(sel.length?'<button class="limpar" id="limpar">Limpar filtro</button>':'')+'</aside><div><p class="conta">'+it.length+(it.length===1?" produto":" produtos")+(vari?" · "+esc(vari):"")+'</p>'+(it.length?'<div class="grade">'+it.map(function(p){return '<a class="card" href="#'+p.id+'">'+img(p)+'<h2>'+esc(p.nome)+'</h2><p>'+brl2(p)+'</p></a>'}).join("")+'</div>':'<p class="conta">Nenhum produto nesse tamanho.</p>')+'</div></div>';
  app.querySelectorAll("a.card").forEach(hoverFotos);
  app.querySelectorAll("[data-c]").forEach(function(b){b.onclick=function(){var c=b.dataset.c;aberto=VV[c]?(aberto===c?null:c):null;if(cat!==c){cat=c;vari=null;sel=[]}lista()}});
  app.querySelectorAll("[data-v]").forEach(function(b){b.onclick=function(){cat=b.dataset.vc;vari=b.dataset.v||null;sel=[];aberto=null;lista()}});
@@ -103,7 +70,7 @@ function addCart(p,t){
 var CUPOM=null,CUPMSG="";
 function cupomHTML(d){var h='<div style="padding:14px 0 0">';
  if(CUPOM)h+='<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.9rem"><span>Cupom <b>'+esc(CUPOM.codigo)+'</b>: -'+brl(d)+'</span><button type="button" id="cpx" style="background:none;border:0;text-decoration:underline;cursor:pointer;color:inherit;font:inherit">Remover</button></div>';
- else h+='<div style="display:flex;gap:8px"><input id="cpi" placeholder="Cupom de desconto" autocapitalize="characters" style="flex:1;min-width:0;padding:10px;border:1px solid #ccc;border-radius:8px;font:inherit"><button type="button" id="cpa" style="padding:10px 14px;border:1px solid #111;border-radius:8px;background:#fff;font:inherit;cursor:pointer">Aplicar</button></div>';
+ else h+='<div class="cp-l"><input class="cp-i" id="cpi" placeholder="Cupom de desconto" autocapitalize="characters"><button type="button" class="cp-b" id="cpa">Aplicar</button></div>';
  if(CUPMSG)h+='<p style="margin:6px 0 0;font-size:.85rem;color:#b3261e">'+esc(CUPMSG)+'</p>';
  return h+'</div>'}
 function aplicaCupom(){var el=document.getElementById("cpi"),c=(el&&el.value||"").trim().toUpperCase();if(!c)return;var tot=CART.reduce(function(s,x){return s+x.p*x.q},0);
